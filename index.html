@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系統平台複習小測驗</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Fredoka', '微軟正黑體', sans-serif; background-color: #fce7f3; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; overflow-x: hidden; }
+        .quiz-desktop-container { width: 100%; max-width: 1000px; min-height: 80vh; background-color: #ffffff; border-radius: 20px; padding: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
+        .content-container { padding: 0; display: flex; flex-direction: column; justify-content: flex-start; flex: 1; }
+        #message-box.opacity-100 { top: 4rem; position: fixed; z-index: 100; }
+        
+        /* Drag Items */
+        .drag-item { cursor: grab; display: inline-flex; align-items: center; justify-content: center; border-radius: 12px; font-weight: 600; box-shadow: 0 3px 0 rgba(0,0,0,0.2); border: 2px solid; transition: all 0.15s; touch-action: none; background-color: white; user-select: none; z-index: 10; }
+        .dragging { opacity: 0.5; transform: scale(0.9); cursor: grabbing; }
+        
+        /* Q1 */
+        .q1-slot { display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; margin: 0 5px; height: 60px; background-image: linear-gradient(to right, #a855f7 0%, #a855f7 70%, transparent 70%, transparent 100%); background-size: 50px 3px; background-repeat: repeat-x; background-position: bottom left; border-radius: 4px; transition: all 0.2s; }
+        .q1-slot.drag-over { background-color: #f3e8ff; border-radius: 8px; }
+        .q1-slot.filled { background-image: none; }
+        .q1-word-item { font-size: 1.5rem; height: 100%; width: auto; min-width: 80px; padding: 0 1.5rem; }
+
+        /* General Slot/Bucket */
+        .category-target { min-height: 120px; padding: 1rem; border: 3px dashed; border-radius: 16px; transition: all 0.2s; }
+        .category-target.drag-over { transform: scale(1.05); background-color: rgba(255, 255, 255, 0.7) !important; border-style: solid; }
+        .category-item { width: 110px; height: 100px; flex-shrink: 0; margin: 4px; font-size: 0.9rem; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0.5rem; }
+        .category-item .emoji { font-size: 1.5rem; margin-bottom: 4px; }
+        
+        /* Reset styles when inside slots */
+        .category-target .item-container .category-item, .fixed-slot .drag-item, .fixed-slot .category-item, .q1-slot .drag-item, .unit-match-slot .drag-item, .gen-target-slot .drag-item { width: 100% !important; height: 100% !important; margin: 0 !important; padding: 0; border: none; box-shadow: none; background: transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 8px; }
+        
+        .fixed-slot { width: 100px; height: 100px; border: 3px dashed #cbd5e1; border-radius: 12px; background-color: #f1f5f9; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; margin: 5px; }
+        .fixed-slot.drag-over { background-color: #e0e7ff; border-color: #6366f1; transform: scale(1.05); }
+
+        /* Q3 (Unit Match) */
+        .unit-match-item { width: auto; padding: 10px; }
+        .unit-match-unit { height: 120px; padding: 10px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .unit-match-slot { width: 95%; height: 60px; border: 2px dashed rgba(255, 255, 255, 0.7); border-radius: 8px; background-color: rgba(255, 255, 255, 0.4); margin-top: 5px; }
+        .unit-match-slot.drag-over { background-color: rgba(255, 255, 255, 0.8); }
+        .unit-title { font-weight: bold; font-size: 1.2rem; margin-bottom: 5px; color: #374151; }
+        
+        .q3-desc-box { border: 2px solid #e5e7eb; border-radius: 12px; padding: 15px; background-color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: space-between; height: 100%; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .q3-desc-text { font-size: 0.95rem; color: #4b5563; margin-bottom: 10px; text-align: center; font-weight: bold; }
+
+        /* Q5, Q6 */
+        .q5-speed-title { font-size: 1.5rem; font-weight: 800; color: #10b981; text-align: center; margin: 0 10px; flex-shrink: 0; line-height: 1.2; }
+        .q5-row { display: flex; align-items: center; justify-content: center; margin-bottom: 1rem; padding: 10px 0; }
+        .q5-slots { display: flex; gap: 15px; flex-grow: 1; justify-content: center; align-items: center; }
+
+        /* Q7 電腦元件發展史 (Modified Layout) */
+        .gen-table-layout {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr); /* 5 columns */
+            gap: 15px 5px; /* Vertical gap, Horizontal gap */
+            width: 100%;
+            margin-top: 20px;
+        }
+        .gen-table-header {
+            text-align: center;
+            font-weight: bold;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .gen-table-cell {
+            display: flex;
+            justify-content: center;
+            align-items: start;
+        }
+        .gen-target-slot { 
+            width: 140px; 
+            height: 60px; 
+            border: 2px dashed #9ca3af;
+            background-color: white;
+        }
+
+        /* Q2 Checkbox */
+        .table-check-container { width: 100%; border-collapse: separate; border-spacing: 0; overflow: hidden; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .table-check-container th { background-color: #f9a8d4; color: white; font-weight: 600; padding: 12px 10px; text-align: center; transition: background-color 0.3s; }
+        .table-check-container td:first-child { font-weight: bold; color: #4b5563; text-align: left; width: 30%; transition: all 0.3s; }
+        .table-check-container td { background-color: #fff; border-bottom: 1px solid #fce7f3; padding: 10px; text-align: center; transition: background-color 0.3s; }
+        .check-box-wrapper { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+        .check-box { width: 32px; height: 32px; border: 2px solid #a855f7; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; background-color: #f3e8ff; }
+        .check-box.checked { background-color: #a855f7; border-color: #a855f7; transform: scale(1.05); }
+        .check-mark { color: white; font-size: 20px; line-height: 1; transition: opacity 0.15s; }
+
+        /* Lifeline */
+        .lifeline-btn { font-size: 1.5rem; cursor: pointer; transition: all 0.2s; filter: grayscale(0%); opacity: 1; }
+        .lifeline-btn:hover { transform: scale(1.2); }
+        .lifeline-btn.used { filter: grayscale(100%); opacity: 0.3; cursor: not-allowed; transform: scale(0.9); }
+        
+        /* Buttons */
+        input:checked + label { transform: translateY(4px); box-shadow: none !important; }
+        .shadow-3d { box-shadow: 0 4px 0 rgba(0,0,0,0.15); }
+        .shadow-3d:active { box-shadow: 0 0 0 rgba(0,0,0,0.15); transform: translateY(4px); }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+
+    <div id="quiz-container" class="quiz-desktop-container">
+        <div class="content-container"> 
+            <header class="mb-6 text-center flex justify-between items-center">
+                <div class="inline-block bg-white px-6 py-2 rounded-full shadow-sm">
+                    <span class="text-pink-500 font-bold tracking-wider">UNIT 1 REVIEW</span>
+                </div>
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-800 drop-shadow-sm absolute left-1/2 transform -translate-x-1/2">
+                    💻 系統平台小測驗
+                </h1>
+                <div class="w-20"></div>
+            </header>
+
+            <div id="start-screen" class="text-center flex-1 flex flex-col justify-center items-center h-full">
+                <div class="bg-white p-8 rounded-[3rem] shadow-xl mb-8 w-64 h-64 flex items-center justify-center border-4 border-pink-200 animate-bounce">
+                    <span class="text-8xl">🚀</span>
+                </div>
+                <h2 class="text-2xl md:text-3xl font-bold mb-3 text-gray-700">準備好了嗎？</h2>
+                <p class="text-lg text-gray-500 mb-8">讓我們來複習一下課本重點吧！</p>
+                <button onclick="startQuiz()" class="w-full max-w-xs bg-gradient-to-r from-green-400 to-green-500 text-white text-2xl font-bold py-4 rounded-2xl shadow-3d hover:brightness-105 active:scale-95 transition-all">開始挑戰</button>
+            </div>
+
+            <div id="question-display" class="hidden flex-1 flex flex-col">
+                <div class="bg-white rounded-3xl p-6 shadow-lg mb-6 border-l-8 border-purple-400">
+                    <div class="flex items-center mb-4">
+                        <span class="bg-purple-100 text-purple-600 px-3 py-1 rounded-lg font-bold text-sm mr-2">QUESTION</span>
+                        <span id="question-number" class="text-2xl font-bold text-purple-600"></span>
+                    </div>
+                    <div id="question-text-wrapper" class="text-xl md:text-2xl font-bold text-gray-800 leading-relaxed">
+                        <p id="question-text"></p>
+                    </div>
+                </div>
+
+                <div id="options-container" class="space-y-4 mb-8 flex-1"></div>
+
+                <div class="mt-auto pt-4 flex justify-between items-center relative">
+                    <button id="prev-btn" onclick="prevQuestion()" class="px-4 py-2 bg-gray-300 rounded-xl shadow-md hover:bg-gray-400 transition text-gray-800 font-bold" disabled>上一題</button>
+                    <div class="flex items-center gap-4">
+                        <button onclick="checkCurrentAnswer(false)" class="bg-gray-800 text-white text-lg font-bold py-3 px-8 rounded-xl shadow-3d hover:bg-gray-700 active:scale-95 transition-all flex items-center justify-center">
+                            <span>確認答案</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                        </button>
+                        <div id="lifeline-container" class="flex gap-2 bg-red-50 p-2 rounded-lg border border-red-100" title="使用急救包顯示錯誤 (剩餘次數)">
+                            <div id="lifeline-1" class="lifeline-btn" onclick="useLifeline(1)">🚑</div>
+                            <div id="lifeline-2" class="lifeline-btn" onclick="useLifeline(2)">🚑</div>
+                            <div id="lifeline-3" class="lifeline-btn" onclick="useLifeline(3)">🚑</div>
+                        </div>
+                    </div>
+                    <button id="next-btn" onclick="nextQuestion()" class="px-4 py-2 bg-purple-500 text-white rounded-xl shadow-md hover:bg-purple-600 transition font-bold">下一題</button>
+                </div>
+            </div>
+
+            <div id="result-display" class="hidden text-center flex-1 flex flex-col justify-center items-center">
+                <div class="bg-white p-8 rounded-3xl shadow-xl w-full max-w-sm border-4 border-dashed border-gray-300">
+                    <div id="result-icon" class="text-8xl mb-4">🎉</div>
+                    <h2 id="final-message" class="text-3xl font-extrabold mb-2"></h2>
+                    <div class="my-6 space-y-2">
+                        <div class="text-xl text-gray-600">作答次數：<span id="attempt-count" class="font-bold text-purple-600 text-2xl"></span></div>
+                        <div class="text-xl text-gray-600">作答時間：<span id="time-taken" class="font-bold text-blue-600 text-2xl"></span></div>
+                        <div class="mt-4">
+                            <span class="text-gray-400 text-sm uppercase tracking-widest">Score</span>
+                            <div class="text-6xl font-bold text-gray-800" id="final-score-number"></div>
+                            <p id="final-score-text" class="text-gray-500 mt-2"></p>
+                        </div>
+                    </div>
+                    <button onclick="restartQuiz()" class="w-full bg-yellow-400 text-yellow-900 text-xl font-bold py-3 rounded-xl shadow-3d hover:bg-yellow-300 active:scale-95 transition-all">再玩一次</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        // --- 1. Helper Functions ---
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function showMessage(msg, bgColor) {
+            let messageBox = document.getElementById('message-box');
+            if (!messageBox) {
+                messageBox = document.createElement('div');
+                messageBox.id = 'message-box';
+                document.body.appendChild(messageBox);
+            }
+            messageBox.textContent = msg;
+            messageBox.className = `fixed top-4 left-1/2 transform -translate-x-1/2 z-50 px-8 py-4 rounded-xl shadow-2xl text-white font-bold text-lg text-center transition-all duration-300 opacity-100 scale-100 ${bgColor} border-4 border-white`;
+            setTimeout(() => { hideMessage(); }, 3000); 
+        }
+
+        function hideMessage() {
+            const box = document.getElementById('message-box');
+            if (box) { box.classList.remove('opacity-100', 'scale-100'); box.classList.add('opacity-0', 'scale-90'); }
+        }
+
+        function createCheckButton(platformName, columnIndex) {
+            const uniqueId = `check-${platformName}-${columnIndex}`;
+            return `<div class="check-box-wrapper"><div id="${uniqueId}" class="check-box" onclick="toggleSelection('${platformName}', ${columnIndex}, this)"><span class="check-mark opacity-0">✓</span></div></div>`;
+        }
+
+        function toggleSelection(platformName, columnIndex, element) {
+            const currentAnswer = answers[currentQuestionIndex] || {};
+            const currentlySelected = currentAnswer[platformName];
+            const row = element.closest('tr');
+            if (row) { row.querySelectorAll('.check-box').forEach(box => { box.classList.remove('checked'); box.querySelector('.check-mark').classList.add('opacity-0'); }); }
+            if (currentlySelected === columnIndex) { currentAnswer[platformName] = -1; } 
+            else { element.classList.add('checked'); element.querySelector('.check-mark').classList.remove('opacity-0'); currentAnswer[platformName] = columnIndex; }
+            answers[currentQuestionIndex] = currentAnswer;
+        }
+
+        function loadTableSelectionAnswers() {
+            const savedAnswers = answers[currentQuestionIndex] || {};
+            for (const platformName in savedAnswers) {
+                const columnIndex = savedAnswers[platformName];
+                if (columnIndex !== -1) {
+                    const uniqueId = `check-${platformName}-${columnIndex}`;
+                    const element = document.getElementById(uniqueId);
+                    if (element) { element.classList.add('checked'); element.querySelector('.check-mark').classList.remove('opacity-0'); }
+                }
+            }
+        }
+
+        function createDragItem(id, text, palette, isQ3 = false) {
+            const div = document.createElement('div');
+            div.id = id;
+            div.className = `drag-item ${palette.bg} ${palette.border} ${palette.text} shadow-sm hover:shadow-md transition-all`;
+            if (isQ3) { div.classList.add('category-item'); }
+            div.dataset.initialBorderColor = palette.border.replace('border', '#').replace('400', '600'); 
+            div.draggable = true;
+            div.ondragstart = drag;
+            div.ontouchstart = touchStart;
+            div.ontouchend = touchEnd;
+            div.textContent = text;
+            return div;
+        }
+
+        // --- 2. Data & Variables ---
+        const colorPalettes = [
+            { bg: 'bg-red-100', border: 'border-red-400', text: 'text-red-800', hex: '#fee2e2' }, 
+            { bg: 'bg-orange-100', border: 'border-orange-400', text: 'text-orange-800', hex: '#ffedd5' }, 
+            { bg: 'bg-green-100', border: 'border-green-400', text: 'text-green-800', hex: '#d1fae5' }, 
+            { bg: 'bg-blue-100', border: 'border-blue-400', text: 'text-blue-800', hex: '#dbeafe' }, 
+            { bg: 'bg-purple-100', border: 'border-purple-400', text: 'text-purple-800', hex: '#f3e8ff' }, 
+            { bg: 'bg-pink-100', border: 'border-pink-400', text: 'text-pink-800', hex: '#fce7f3' }, 
+            { bg: 'bg-teal-100', border: 'border-teal-400', text: 'text-teal-800', hex: '#ccfbf1' } 
+        ];
+
+        const quizData = [
+            {
+                type: 'drag_and_drop', // Q1
+                question: "系統平台又稱[__]平臺，指的是利用電腦的[__]，來提供使用者各項[__]的[__]。",
+                blanks: ["運算", "運算能力", "服務", "執行環境"], 
+                options: ["運算", "運算能力", "服務", "執行環境"], 
+            },
+            {
+                type: 'table_selection', // Q2
+                question: "請將下列系統平台，分類為「傳統系統平台」或「新興系統平台」。",
+                columns: ["平台種類", "傳統系統平台", "新興系統平台"],
+                platformData: [
+                    { name: "電腦系統平台", classification: 0 },
+                    { name: "可攜式系統平台", classification: 1 },
+                    { name: "雲端系統平台", classification: 1 },
+                    { name: "嵌入式系統平台", classification: 1 },
+                ]
+            },
+            {
+                type: 'dnd_units_reverse', // Q3: 五大單元配對
+                question: "請將上方的功能描述，拖曳至下方對應的五大單元方框中。",
+                units: [
+                    { name: "輸入單元", unitId: 'input', emoji: '📥', color: {bg: '#fee2e2', border: '#fca5a5'} },
+                    { name: "輸出單元", unitId: 'output', emoji: '📤', color: {bg: '#d1fae5', border: '#86efac'} },
+                    { name: "記憶單元", unitId: 'memory', emoji: '💾', color: {bg: '#ffedd5', border: '#fdbd83'} },
+                    { name: "控制單元", unitId: 'control', emoji: '🎮', color: {bg: '#dbeafe', border: '#93c5fd'} },
+                    { name: "算術與邏輯單元", unitId: 'alu', emoji: '➕', color: {bg: '#f3e8ff', border: '#d8b4fe'} }
+                ],
+                descriptions: [
+                    { text: "輸入外部資訊到系統內", unitId: 'input', color: 'bg-red-100 border-red-300' },
+                    { text: "輸出運算結果到設備中", unitId: 'output', color: 'bg-green-100 border-green-300' },
+                    { text: "進行資訊的儲存", unitId: 'memory', color: 'bg-yellow-100 border-yellow-300' },
+                    { text: "控制、協調各單元之間的合作", unitId: 'control', color: 'bg-blue-100 border-blue-300' },
+                    { text: "進行二進位的運算和邏輯運算", unitId: 'alu', color: 'bg-purple-100 border-purple-300' }
+                ]
+            },
+            {
+                type: 'category_bucket', // Q4: 應用實例
+                question: "請將上方的實際應用範例，拖曳至下方的正確系統平台分類中。",
+                categories: [
+                    { name: "電腦系統平台", id: 'traditional', color: 'border-orange-400 bg-orange-50' },
+                    { name: "可攜式系統平台", id: 'portable', color: 'border-blue-400 bg-blue-50' },
+                    { name: "雲端系統平台", id: 'cloud', color: 'border-green-400 bg-green-50' },
+                    { name: "嵌入式系統平台", id: 'embedded', color: 'border-purple-4个 bg-purple-50' }
+                ],
+                items: [
+                    { name: "筆記型電腦 (NB)", categoryId: 'traditional', emoji: '💻' },
+                    { name: "智慧型手機", categoryId: 'portable', emoji: '📱' },
+                    { name: "Gmail/雲端郵件", categoryId: 'cloud', emoji: '📧' },
+                    { name: "全自動洗衣機", categoryId: 'embedded', emoji: '🧺' }
+                ]
+            },
+            {
+                type: 'category_slots', // Q5: I/O 
+                question: "請將下列週邊設備，拖曳至正確的電腦單元分類格子中 (一格一個)。",
+                categories: [
+                    { name: "輸入單元 (Input)", id: 'input', color: 'border-pink-400 bg-pink-100', slots: 4 },
+                    { name: "輸出單元 (Output)", id: 'output', color: 'border-cyan-400 bg-cyan-100', slots: 4 }
+                ],
+                items: [
+                    { name: "攝影機", categoryId: 'input', emoji: '🎥' },
+                    { name: "鍵盤", categoryId: 'input', emoji: '⌨️' },
+                    { name: "滑鼠", categoryId: 'input', emoji: '🖱️' },
+                    { name: "麥克風", categoryId: 'input', emoji: '🎤' },
+                    { name: "耳機", categoryId: 'output', emoji: '🎧' }, 
+                    { name: "喇叭", categoryId: 'output', emoji: '🔊' },
+                    { name: "印表機", categoryId: 'output', emoji: '🖨️' },
+                    { name: "螢幕", categoryId: 'output', emoji: '🖥️' }
+                ]
+            },
+            {
+                type: 'table_sort_random', // Q6: 記憶體階層
+                question: "請依據指定條件，將記憶體種類拖曳至表格中的正確位置。",
+                variations: [
+                    { labelStart: "存取速度", labelEnd: "快 ⮕ 慢", type: "speed_fast_slow", order: ["register", "cache", "ram", "secondary"] },
+                    { labelStart: "存取速度", labelEnd: "慢 ⮕ 快", type: "speed_slow_fast", order: ["secondary", "ram", "cache", "register"] },
+                    { labelStart: "價格", labelEnd: "高 ⮕ 低", type: "price_high_low", order: ["register", "cache", "ram", "secondary"] },
+                    { labelStart: "價格", labelEnd: "低 ⮕ 高", type: "price_low_high", order: ["secondary", "ram", "cache", "register"] },
+                    { labelStart: "容量", labelEnd: "大 ⮕ 小", type: "cap_large_small", order: ["secondary", "ram", "cache", "register"] },
+                    { labelStart: "容量", labelEnd: "小 ⮕ 大", type: "cap_small_large", order: ["register", "cache", "ram", "secondary"] }
+                ],
+                sourceItems: [
+                    { id: 'register', name: "暫存器", emoji: "⚡" },
+                    { id: 'cache', name: "快取", emoji: "🚅" },
+                    { id: 'ram', name: "主記憶體", emoji: "🧠" },
+                    { id: 'secondary', name: "輔助記憶體", emoji: "💾" }
+                ]
+            },
+            {
+                 type: 'category_slots_gen', // Q7: 電腦元件發展史
+                 question: "請將下方的電腦主要元件，拖曳到對應的電腦世代 (水平排列)。",
+                 categories: [
+                    { name: "第一代", id: 'gen1', color: 'bg-red-500', slots: 1 },
+                    { name: "第二代", id: 'gen2', color: 'bg-orange-500', slots: 1 },
+                    { name: "第三代", id: 'gen3', color: 'bg-yellow-500', slots: 1 },
+                    { name: "第四代", id: 'gen4', color: 'bg-green-500', slots: 1 },
+                    { name: "第五代", id: 'gen5', color: 'bg-blue-500', slots: 1 }
+                 ],
+                 items: [
+                     { name: "積體電路 (IC)", categoryId: 'gen3', emoji: '🔸' },
+                     { name: "真空管", categoryId: 'gen1', emoji: '💡' },
+                     { name: "超大型積體電路 (VLSI)", categoryId: 'gen4', emoji: '🔺' },
+                     { name: "電晶體", categoryId: 'gen2', emoji: '🔘' },
+                     { name: "小元件、多核心", categoryId: 'gen5', emoji: '🌐' }
+                 ]
+            },
+            {
+                 type: 'drag_and_drop_2col', // Q8: 英文縮寫
+                 question: "請將左側的英文縮寫，拖曳到右側正確的中文名稱上。",
+                 leftItems: [
+                     { name: "Big Data", value: 'big_data' },
+                     { name: "AI", value: 'ai' },
+                     { name: "IoT", value: 'iot' }
+                 ],
+                 rightItems: [
+                     { name: "人工智慧", correctValue: 'ai' },
+                     { name: "物聯網", correctValue: 'iot' },
+                     { name: "大數據", correctValue: 'big_data' }
+                 ]
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let questionStatuses = Array(quizData.length).fill(null); 
+        let quizState = {}; 
+        let answers = {}; 
+        let quizStartTime = null;
+        let attemptCount = 0;
+        let lifelines = 3;
+
+        // --- 3. Drag & Drop Handlers ---
+
+        function drag(event) {
+            event.dataTransfer.setData("text/plain", event.target.id);
+            const ds = event.target.dataset;
+            if (ds.value) event.dataTransfer.setData("value", ds.value);
+            if (ds.categoryId) event.dataTransfer.setData("categoryId", ds.categoryId);
+            if (ds.unitId) event.dataTransfer.setData("unitId", ds.unitId);
+            if (ds.typeId) event.dataTransfer.setData("typeId", ds.typeId);
+            if (ds.correctValue) event.dataTransfer.setData("correctValue", ds.correctValue);
+
+            setTimeout(() => { event.target.classList.add('dragging'); }, 0);
+        }
+
+        function allowDrop(event) { event.preventDefault(); }
+        function dragEnter(event) { event.target.closest('.drop-zone, .category-target, .fixed-slot, .q1-slot')?.classList.add('drag-over'); }
+        function dragLeave(event) { event.target.closest('.drop-zone, .category-target, .fixed-slot, .q1-slot')?.classList.remove('drag-over'); }
+        function touchStart(event) { event.target.closest('.drag-item')?.classList.add('dragging'); }
+        function touchEnd(event) { event.target.closest('.drag-item')?.classList.remove('dragging'); }
+        function touchMove(e) {} 
+        
+        // --- General LIFO Drop Handler for Fixed Slots ---
+        function dropSlotLIFO(event) {
+            event.preventDefault();
+            const id = event.dataTransfer.getData("text/plain");
+            const el = document.getElementById(id);
+            let targetSlot = event.target.closest('.fixed-slot, .q1-slot, .unit-match-slot, .gen-target-slot, .q8-target-slot'); 
+
+            if (targetSlot) {
+                // LIFO Logic
+                if (targetSlot.children.length > 0) {
+                    const oldItem = targetSlot.firstElementChild;
+                    // Find correct source based on currentQuestionIndex
+                    let sourceId = '';
+                    if (currentQuestionIndex === 0) sourceId = 'q1-source';
+                    else if (currentQuestionIndex === 2) sourceId = 'q3-unit-source'; // Q3 (Unit Match)
+                    else if (currentQuestionIndex === 4) sourceId = 'q5-source'; // Q5
+                    else if (currentQuestionIndex === 5) sourceId = 'q6-source'; // Q6
+                    else if (currentQuestionIndex === 6) sourceId = 'q7-source'; // Q7
+                    else if (currentQuestionIndex === 7) sourceId = 'q8-source'; // Q8
+                    
+                    if (sourceId) {
+                        const source = document.getElementById(sourceId);
+                        if(source) {
+                            source.appendChild(oldItem);
+                            oldItem.style.margin = ''; oldItem.style.width = '';
+                            
+                            // Restore original styles
+                            if (currentQuestionIndex === 0) oldItem.style.width = 'auto'; // Q1
+                            if (currentQuestionIndex === 2) { oldItem.style.width = '200px'; oldItem.style.height = 'auto'; } // Q3 Desc
+                            if (currentQuestionIndex === 5) oldItem.style.width = '100px'; // Q6
+                            if (currentQuestionIndex === 6) oldItem.style.width = '140px'; // Q7
+                            if (currentQuestionIndex === 7) oldItem.style.width = '150px'; // Q8
+                        }
+                    }
+                }
+                
+                if (el) {
+                    el.classList.remove('dragging');
+                    targetSlot.appendChild(el);
+                    targetSlot.classList.remove('drag-over');
+                    targetSlot.classList.add('filled');
+                    
+                    el.style.margin = '0';
+                    el.style.width = '100%';
+                    // Q3 items need height auto to fit text
+                    if (currentQuestionIndex === 2) el.style.height = '100%';
+                }
+            } else if (el) {
+                el.classList.remove('dragging');
+            }
+        }
+        
+        // Q4 專用的 drop handler (Bucket - LIFO 替換邏輯)
+        function dropQ3_LIFO(event) {
+            event.preventDefault();
+            const id = event.dataTransfer.getData("text/plain");
+            const el = document.getElementById(id);
+            const itemContainer = event.target.closest('.item-container');
+            const targetBucket = itemContainer ? itemContainer.closest('.category-target') : null;
+
+            if (!targetBucket) {
+                 if (el) el.classList.remove('dragging');
+                 return;
+            }
+
+            const sourceWrapper = document.getElementById('q4-source'); // Q4 Source ID
+
+            if (itemContainer && sourceWrapper) {
+                // LIFO for Bucket (limit 1)
+                if (itemContainer.children.length > 0) {
+                    const oldItem = itemContainer.firstElementChild;
+                    oldItem.style.margin = '4px'; 
+                    oldItem.style.width = '110px'; 
+                    sourceWrapper.appendChild(oldItem);
+                    oldItem.classList.remove('dragging');
+                }
+                
+                el.classList.remove('dragging');
+                itemContainer.appendChild(el);
+                targetBucket.classList.remove('drag-over');
+                
+                el.style.margin = '0'; 
+                el.style.width = '100%'; 
+            } else if (el) {
+                el.classList.remove('dragging');
+            }
+        }
+        
+        // --- Loaders ---
+        function loadQ1_FillBlanks(q) {
+            document.getElementById('question-text').textContent = q.question;
+            const wrapper = document.getElementById('question-text');
+            const container = document.getElementById('options-container');
+            let html = q.question;
+            q.blanks.forEach((ans, idx) => {
+                const width = ans.length === 4 ? '200px' : '100px';
+                let slotHtml = `<div id="q1-slot-${idx}" class="q1-slot" style="width:${width}" data-answer="${ans}" ondragover="allowDrop(event)" ondrop="dropSlotLIFO(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)"></div>`;
+                html = html.replace('[__]', slotHtml);
+            });
+            wrapper.innerHTML = html;
+            const pool = [...q.options];
+            shuffleArray(pool);
+            const sourceDiv = document.createElement('div');
+            sourceDiv.id = 'q1-source';
+            sourceDiv.className = 'flex flex-wrap justify-center gap-4 bg-white p-4 rounded-xl border-2 border-dashed border-gray-300 min-h-[80px]';
+            pool.forEach((opt, i) => {
+                const el = document.createElement('div');
+                el.id = `q1-word-${i}`;
+                const palette = colorPalettes[Math.floor(Math.random() * colorPalettes.length)];
+                el.className = `drag-item q1-word-item ${palette.bg} ${palette.border} ${palette.text} shadow-sm hover:shadow-md transition-all`;
+                el.draggable = true;
+                el.ondragstart = drag;
+                el.ontouchstart = touchStart;
+                el.ontouchend = touchEnd;
+                el.textContent = opt;
+                el.dataset.value = opt;
+                sourceDiv.appendChild(el);
+            });
+            container.appendChild(sourceDiv);
+        }
+
+        // --- Q7: Generation Slots (Updated Layout: 2 Rows Table) ---
+        function loadQ7_GenerationSlots(q) {
+            document.getElementById('question-text').textContent = q.question;
+            const container = document.getElementById('options-container');
+
+            // Source
+            const source = document.createElement('div');
+            source.id = 'q7-source';
+            source.className = 'flex flex-wrap justify-center gap-3 p-4 min-h-[110px] bg-gray-50 rounded-xl mb-4';
+            const items = [...q.items];
+            shuffleArray(items);
+            items.forEach((item, i) => {
+                const el = createDragItem(`q7-item-${i}`, item.name, colorPalettes[i % colorPalettes.length]);
+                el.innerHTML = `<span class="emoji">${item.emoji}</span><span>${item.name}</span>`;
+                el.classList.add('category-item-standard');
+                el.dataset.categoryId = item.categoryId; 
+                el.style.width = '140px'; el.style.height = '60px';
+                source.appendChild(el);
+            });
+            container.appendChild(source);
+
+            // Table Layout
+            const genContainer = document.createElement('div');
+            genContainer.className = 'gen-table-layout'; // Using new grid class
+            
+            // Row 1: Headers
+            q.categories.forEach(cat => {
+                const header = document.createElement('div');
+                header.className = 'gen-table-header';
+                header.textContent = cat.name;
+                // Simple color mapping based on Tailwind classes string
+                if(cat.color.includes('red')) header.style.backgroundColor = '#ef4444';
+                if(cat.color.includes('orange')) header.style.backgroundColor = '#f97316';
+                if(cat.color.includes('yellow')) header.style.backgroundColor = '#eab308';
+                if(cat.color.includes('green')) header.style.backgroundColor = '#22c55e';
+                if(cat.color.includes('blue')) header.style.backgroundColor = '#3b82f6';
+                genContainer.appendChild(header);
+            });
+
+            // Row 2: Slots
+            q.categories.forEach(cat => {
+                const slotCell = document.createElement('div');
+                slotCell.className = 'gen-table-cell';
+                for(let i=0; i<cat.slots; i++) {
+                    const slot = document.createElement('div');
+                    slot.className = 'fixed-slot gen-target-slot';
+                    slot.dataset.expectedCat = cat.id;
+                    slot.style.width = '140px'; 
+                    slot.style.height = '60px'; 
+                    slot.ondragover = allowDrop;
+                    slot.ondrop = dropSlotLIFO;
+                    slot.ondragenter = dragEnter;
+                    slot.ondragleave = dragLeave;
+                    slotCell.appendChild(slot);
+                }
+                genContainer.appendChild(slotCell);
+            });
+
+            container.appendChild(genContainer);
+        }
+
+        // Q2, Q3, Q4, Q5, Q6, Q8 Loaders (Standard)
+        function loadQ2_TableSelection(q) {
+             const container = document.getElementById('options-container');
+            const table = document.createElement('table');
+            table.className = 'table-check-container';
+            const classificationMap = [{ id: 0, name: "傳統系統平台", colorClass: 'bg-yellow-200', hex: '#fef08a', headerHex: '#fcd34d' }, { id: 1, name: "新興系統平台", colorClass: 'bg-teal-200', hex: '#99f6e4', headerHex: '#5eead4' }];
+            const classificationTypes = [...classificationMap];
+            shuffleArray(classificationTypes); 
+            const thead = table.createTHead();
+            const headerRow = thead.insertRow();
+            const th0 = document.createElement('th');
+            th0.textContent = q.columns[0];
+            headerRow.appendChild(th0);
+            classificationTypes.forEach(type => {
+                const th = document.createElement('th');
+                th.textContent = type.name;
+                th.style.backgroundColor = type.headerHex; 
+                th.style.color = '#1f2937'; 
+                th.dataset.columnId = type.id; 
+                headerRow.appendChild(th);
+            });
+            const tbody = table.createTBody();
+            const rowsData = [...q.platformData];
+            shuffleArray(rowsData); 
+            rowsData.forEach((platform, rowIndex) => {
+                const row = tbody.insertRow();
+                const platformPalette = colorPalettes[rowIndex % colorPalettes.length]; 
+                const initialRowColor = platformPalette.hex;
+                const nameCell = row.insertCell();
+                nameCell.textContent = platform.name;
+                nameCell.style.backgroundColor = initialRowColor; 
+                nameCell.dataset.initialColor = initialRowColor; 
+                classificationTypes.forEach((type) => { 
+                    const cell = row.insertCell();
+                    cell.dataset.classificationId = type.id; 
+                    cell.style.backgroundColor = type.hex; 
+                    cell.dataset.columnColor = type.hex; 
+                    cell.innerHTML = createCheckButton(platform.name, type.id); 
+                });
+            });
+            container.appendChild(table);
+            loadTableSelectionAnswers();
+        }
+
+        function loadQ3_UnitMatching(q) {
+             const container = document.getElementById('options-container');
+            const source = document.createElement('div');
+            source.id = 'q3-unit-source';
+            source.className = 'flex flex-wrap justify-center gap-3 p-4 min-h-[110px] bg-gray-50 rounded-xl mb-4';
+            const descs = [...q.descriptions];
+            shuffleArray(descs);
+            descs.forEach((desc, i) => {
+                const palette = colorPalettes[i % colorPalettes.length];
+                const el = createDragItem(`q3-desc-item-${i}`, desc.text, { bg: 'bg-white', border: 'border-gray-300', text: 'text-gray-800' });
+                el.style.backgroundColor = '#f9fafb'; el.style.borderColor = '#d1d5db'; el.style.width = '200px'; el.style.height = 'auto'; el.style.minHeight = '60px'; el.style.fontSize = '0.9rem';
+                el.dataset.unitId = desc.unitId;
+                el.classList.add('q3-desc-item'); 
+                source.appendChild(el);
+            });
+            container.appendChild(source);
+            const slotsWrapper = document.createElement('div');
+            slotsWrapper.className = 'grid grid-cols-1 md:grid-cols-5 gap-4'; 
+            const units = [...q.units];
+            shuffleArray(units);
+            units.forEach((unit, i) => {
+                const slotContainer = document.createElement('div');
+                slotContainer.className = `q3-desc-target ${unit.color}`; // Apply class for style if needed, but using inline below
+                slotContainer.style.backgroundColor = unit.color.bg;
+                slotContainer.style.borderColor = unit.color.border;
+                // Add class for common styling
+                slotContainer.classList.add('flex', 'flex-col', 'items-center', 'p-3', 'rounded-xl', 'border-2', 'shadow-md', 'q3-desc-box');
+
+                const text = document.createElement('div');
+                text.className = 'q3-desc-text';
+                text.textContent = unit.name;
+                slotContainer.appendChild(text);
+                const slot = document.createElement('div');
+                slot.className = 'fixed-slot q3-slot unit-match-slot'; 
+                slot.dataset.expectedUnitId = unit.unitId;
+                slot.ondragover = allowDrop; slot.ondrop = dropSlotLIFO; slot.ondragenter = dragEnter; slot.ondragleave = dragLeave;
+                slotContainer.appendChild(slot);
+                slotsWrapper.appendChild(slotContainer);
+            });
+            container.appendChild(slotsWrapper);
+        }
+
+        function loadQ4_Bucket(q) {
+             const container = document.getElementById('options-container');
+            const source = document.createElement('div');
+            source.id = 'q4-source';
+            source.className = 'flex flex-wrap justify-center gap-2 p-4 min-h-[100px] border-b-2 border-gray-100 mb-4';
+            const items = [...q.items];
+            shuffleArray(items);
+            items.forEach((item, i) => {
+                const el = createDragItem(`q4-item-${i}`, item.name, colorPalettes[i%7], true); 
+                el.innerHTML = `<span class="emoji">${item.emoji}</span><span>${item.name}</span>`;
+                el.classList.add('category-item'); 
+                el.dataset.categoryId = item.categoryId;
+                source.appendChild(el);
+            });
+            container.appendChild(source);
+            const grid = document.createElement('div');
+            grid.className = 'grid grid-cols-2 md:grid-cols-4 gap-4';
+            q.categories.forEach(cat => {
+                const bucket = document.createElement('div');
+                bucket.className = `category-target ${cat.color} flex flex-col items-center`;
+                bucket.dataset.categoryId = cat.id;
+                bucket.innerHTML = `<h3 class="font-bold mb-2">${cat.name}</h3><div class="item-container flex flex-wrap justify-center w-full min-h-[100px]" ondragover="allowDrop(event)" ondrop="dropQ3_LIFO(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)"></div>`;
+                grid.appendChild(bucket);
+            });
+            container.appendChild(grid);
+        }
+
+        function loadQ5_Slots(q) {
+             const container = document.getElementById('options-container');
+            const source = document.createElement('div');
+            source.id = 'q5-source';
+            source.className = 'flex flex-wrap justify-center gap-3 p-4 min-h-[110px] bg-gray-50 rounded-xl mb-4';
+            const items = [...q.items];
+            shuffleArray(items);
+            items.forEach((item, i) => {
+                const el = createDragItem(`q5-item-${i}`, item.name, colorPalettes[i%7]);
+                el.innerHTML = `<span class="emoji">${item.emoji}</span><span>${item.name}</span>`;
+                el.classList.add('category-item-standard'); 
+                el.dataset.categoryId = item.categoryId;
+                source.appendChild(el);
+            });
+            container.appendChild(source);
+            const grid = document.createElement('div');
+            grid.className = 'grid grid-cols-1 md:grid-cols-2 gap-6'; 
+            q.categories.forEach(cat => {
+                const section = document.createElement('div');
+                section.className = `p-4 rounded-xl ${cat.color}`;
+                section.innerHTML = `<h3 class="text-xl font-bold text-center mb-4 text-gray-700">${cat.name}</h3>`;
+                const slotsDiv = document.createElement('div');
+                slotsDiv.className = 'slot-container grid grid-cols-2 gap-4 justify-items-center'; 
+                for(let i=0; i<cat.slots; i++) {
+                    const slot = document.createElement('div');
+                    slot.className = 'fixed-slot';
+                    slot.dataset.expectedCat = cat.id;
+                    slot.ondragover = allowDrop; slot.ondrop = dropSlotLIFO; slot.ondragenter = dragEnter; slot.ondragleave = dragLeave;
+                    slotsDiv.appendChild(slot);
+                }
+                section.appendChild(slotsDiv);
+                grid.appendChild(section);
+            });
+            container.appendChild(grid);
+        }
+
+        function loadQ6_Table(q) {
+             const container = document.getElementById('options-container');
+             const randomVar = q.variations[Math.floor(Math.random() * q.variations.length)];
+             const source = document.createElement('div');
+             source.id = 'q6-source';
+             source.className = 'flex flex-wrap justify-center gap-3 p-4 min-h-[110px] bg-gray-50 rounded-xl mb-4 overflow-y-auto max-h-[150px]';
+             q.sourceItems.forEach((item, idx) => {
+                const el = createDragItem(`q6-item-${idx}`, item.name, colorPalettes[idx+2]); 
+                el.innerHTML = `<span class="emoji">${item.emoji}</span><span>${item.name}</span>`;
+                el.classList.add('category-item-standard');
+                el.dataset.typeId = item.id;
+                el.style.width = '100px'; el.style.height = '70px';
+                source.appendChild(el);
+            });
+            container.appendChild(source);
+            const tableWrapper = document.createElement('div');
+            tableWrapper.className = 'q5-table-wrapper';
+            const rowDiv = document.createElement('div');
+            rowDiv.className = 'q5-row';
+            const labelTitle = document.createElement('div');
+            labelTitle.className = 'q5-speed-title'; 
+            labelTitle.innerHTML = `${randomVar.labelStart} <div class="font-normal text-sm text-gray-500">${randomVar.labelEnd}</div>`;
+            rowDiv.appendChild(labelTitle);
+            const slotsDiv = document.createElement('div');
+            slotsDiv.className = 'q5-slots flex flex-row flex-nowrap gap-4';
+            randomVar.order.forEach((correctType, sIdx) => {
+                const slot = document.createElement('div');
+                slot.className = 'fixed-slot q5-target-slot';
+                slot.style.width = '100px'; slot.style.height = '70px'; 
+                slot.dataset.correctType = correctType; 
+                slot.ondragover = allowDrop; slot.ondrop = dropSlotLIFO; slot.ondragenter = dragEnter; slot.ondragleave = dragLeave;
+                slotsDiv.appendChild(slot);
+            });
+            rowDiv.appendChild(slotsDiv);
+            tableWrapper.appendChild(rowDiv);
+            container.appendChild(tableWrapper);
+        }
+
+        function loadQ8_TechMatch(q) {
+             const container = document.getElementById('options-container');
+             const source = document.createElement('div');
+             source.id = 'q8-source';
+             source.className = 'flex flex-wrap justify-center gap-3 p-4 min-h-[110px] bg-gray-50 rounded-xl mb-4';
+             const items = [...q.leftItems];
+             shuffleArray(items);
+             items.forEach((item, i) => {
+                const palette = colorPalettes[i];
+                const el = createDragItem(`q8-item-${i}`, item.name, palette);
+                el.dataset.correctValue = item.value;
+                el.style.width = '150px'; el.style.height = '60px'; el.style.fontSize = '1.8rem'; el.style.fontWeight = 'bold';
+                source.appendChild(el);
+            });
+            container.appendChild(source);
+            const targetsWrapper = document.createElement('div');
+            targetsWrapper.className = 'grid grid-cols-1 md:grid-cols-3 gap-4';
+            const rightItems = [...q.rightItems];
+            shuffleArray(rightItems);
+            rightItems.forEach((target, i) => {
+                 const targetDiv = document.createElement('div');
+                 const palette = colorPalettes[i + 3];
+                 targetDiv.className = `p-4 rounded-xl border-4 border-dashed ${palette.border} ${palette.bg} flex flex-col items-center`;
+                 targetDiv.innerHTML = `<h3 class="font-bold text-lg text-gray-700">${target.name}</h3>`;
+                 const slot = document.createElement('div');
+                 slot.className = 'fixed-slot q8-target-slot mt-2';
+                 slot.style.width = '150px'; slot.style.height = '60px';
+                 slot.dataset.expectedValue = target.correctValue;
+                 slot.ondragover = allowDrop; slot.ondrop = dropSlotLIFO; slot.ondragenter = dragEnter; slot.ondragleave = dragLeave;
+                 targetDiv.appendChild(slot);
+                 targetsWrapper.appendChild(targetDiv);
+            });
+            container.appendChild(targetsWrapper);
+        }
+
+        // --- Core Navigation ---
+        function updateNavigationButtons() {
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            prevBtn.disabled = currentQuestionIndex === 0;
+            if (currentQuestionIndex === quizData.length - 1) {
+                nextBtn.textContent = '完成測驗 (總結)';
+                nextBtn.classList.remove('bg-purple-500', 'hover:bg-purple-600');
+                nextBtn.classList.add('bg-green-500', 'hover:bg-green-600');
+            } else {
+                nextBtn.textContent = '下一題';
+                nextBtn.classList.remove('bg-green-500', 'hover:bg-green-600');
+                nextBtn.classList.add('bg-purple-500', 'hover:bg-purple-600');
+            }
+        }
+        function prevQuestion() { saveCurrentQuestionState(); if (currentQuestionIndex > 0) { currentQuestionIndex--; loadQuestion(); } }
+        function nextQuestion() { saveCurrentQuestionState(); if (currentQuestionIndex < quizData.length - 1) { currentQuestionIndex++; loadQuestion(); } else { showResults(); } }
+        function startQuiz() { currentQuestionIndex = 0; score = 0; questionStatuses = Array(quizData.length).fill(null); quizState = {}; attemptCount++; lifelines = 3; quizStartTime = Date.now(); document.getElementById('start-screen').classList.add('hidden'); document.getElementById('question-display').classList.remove('hidden'); loadQuestion(); }
+        
+        function loadQuestion() {
+            const currentQuestion = quizData[currentQuestionIndex];
+            document.getElementById('question-number').textContent = `#${currentQuestionIndex + 1}`;
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+            
+            // Set text only if it's not handled by specific loader (most are)
+            document.getElementById('question-text').textContent = currentQuestion.question;
+
+            if (currentQuestion.type === 'drag_and_drop') loadQ1_FillBlanks(currentQuestion);
+            else if (currentQuestion.type === 'table_selection') loadQ2_TableSelection(currentQuestion);
+            else if (currentQuestion.type === 'dnd_units_reverse') loadQ3_UnitMatching(currentQuestion); 
+            else if (currentQuestion.type === 'category_bucket') loadQ4_Bucket(currentQuestion); 
+            else if (currentQuestion.type === 'category_slots') loadQ5_Slots(currentQuestion); 
+            else if (currentQuestion.type === 'table_sort_random') loadQ6_Table(currentQuestion); 
+            else if (currentQuestion.type === 'category_slots_gen') loadQ7_GenerationSlots(currentQuestion); 
+            else if (currentQuestion.type === 'drag_and_drop_2col') loadQ8_TechMatch(currentQuestion); 
+            
+            setTimeout(restoreCurrentQuestionState, 0);
+            updateNavigationButtons();
+            updateLifelineUI();
+        }
+
+        // --- Checkers ---
+        function checkQ1(showVisuals) {
+            let errorCount = 0;
+            const slots = document.querySelectorAll('.q1-slot');
+            slots.forEach(slot => { 
+                slot.style.border = '2px dashed #a855f7'; 
+                slot.style.backgroundImage = 'linear-gradient(to right, #a855f7 0%, #a855f7 70%, transparent 70%, transparent 100%)'; 
+                if(slot.firstElementChild) slot.firstElementChild.style.backgroundColor = '';
+            });
+            slots.forEach(slot => {
+                const expectedWord = slot.dataset.answer;
+                const item = slot.firstElementChild;
+                if (item) {
+                    if (item.dataset.value !== expectedWord) {
+                        errorCount++;
+                        if(showVisuals) { slot.style.border = '2px solid #ef4444'; item.style.backgroundColor = '#fca5a5'; slot.style.backgroundImage = 'none'; }
+                    } else if (showVisuals) { slot.style.border = '2px solid #22c55e'; item.style.backgroundColor = '#dcfce7'; slot.style.backgroundImage = 'none'; }
+                } else {
+                    errorCount++;
+                    if(showVisuals) slot.style.border = '2px dashed #ef4444';
+                }
+            });
+            return errorCount;
+        }
+
+        function validateQ2(showVisuals) {
+            let errorCount = 0;
+            const userAnswers = answers[currentQuestionIndex] || {};
+            const rows = document.querySelectorAll('.table-check-container tbody tr');
+            rows.forEach(tr => {
+                const nameCell = tr.querySelector('td:first-child');
+                nameCell.style.backgroundColor = nameCell.dataset.initialColor;
+                tr.querySelectorAll('td:not(:first-child)').forEach(td => { td.style.backgroundColor = td.dataset.columnColor; });
+            });
+            quizData[currentQuestionIndex].platformData.forEach(platform => {
+                const expected = platform.classification;
+                const userSelected = userAnswers[platform.name];
+                const row = Array.from(rows).find(r => r.querySelector('td:first-child').textContent === platform.name);
+                if (!row) return;
+                const nameCell = row.querySelector('td:first-child');
+                const clickedCell = userSelected !== undefined && userSelected !== -1 ? row.querySelector(`td[data-classification-id="${userSelected}"]`) : null;
+                if (userSelected !== undefined && userSelected !== -1) {
+                     if (userSelected !== expected) {
+                         errorCount++;
+                         if(showVisuals) {
+                             nameCell.style.backgroundColor = '#fca5a5'; 
+                             if (clickedCell) clickedCell.style.backgroundColor = '#fca5a5';
+                             const correctCell = row.querySelector(`td[data-classification-id="${expected}"]`);
+                             if(correctCell) correctCell.style.backgroundColor = '#fef08a';
+                         }
+                     }
+                } else { errorCount++; }
+            });
+            return errorCount;
+        }
+
+        function validateGenericSlots(showVisuals, slotSelector, datasetKeyExpected, datasetKeyActual) {
+            let errorCount = 0;
+            const slots = document.querySelectorAll(slotSelector);
+            slots.forEach(slot => {
+                slot.style.borderColor = slotSelector.includes('category-target') ? '' : (slotSelector.includes('q1') ? '' : '#cbd5e1'); 
+                const item = slotSelector.includes('item-container') ? slot.firstElementChild : (slot.children.length > 0 ? slot.firstElementChild : null);
+                if(item) item.style.borderColor = item.dataset.initialBorderColor || '';
+                if (item) {
+                    if (item.dataset[datasetKeyActual] !== slot.dataset[datasetKeyExpected]) {
+                        errorCount++;
+                        if(showVisuals) {
+                            if(slot.classList.contains('category-target')) { item.style.borderColor = 'red'; } 
+                            else { slot.style.borderColor = 'red'; item.style.borderColor = 'red'; }
+                        }
+                    } else if (showVisuals) { slot.style.borderColor = '#22c55e'; }
+                } else {
+                    errorCount++; 
+                    if(showVisuals) slot.style.borderColor = 'red';
+                }
+            });
+            return errorCount;
+        }
+        function validateQ6_Table(showVisuals) { return validateGenericSlots(showVisuals, '.q5-target-slot', 'correctType', 'typeId'); }
+        function checkQ3_UnitMatching(isLifeline) { return validateGenericSlots(isLifeline, '.unit-match-slot', 'expectedUnitId', 'unitId'); }
+        function checkQ4(isLifeline) { // Q4 is bucket
+             let errorCount = 0;
+             const items = document.querySelectorAll('#q4-source ~ .grid .category-item'); 
+             items.forEach(item => {
+                const bucket = item.closest('.category-target');
+                if(isLifeline) item.style.borderColor = item.dataset.initialBorderColor || '';
+                if (!bucket || bucket.dataset.categoryId !== item.dataset.categoryId) {
+                    errorCount++;
+                    if(isLifeline) item.style.borderColor = 'red';
+                } else if (isLifeline) { item.style.borderColor = '#22c55e'; }
+             });
+             if (document.getElementById('q4-source').children.length > 0) errorCount += document.getElementById('q4-source').children.length;
+             return errorCount;
+        }
+        function checkQ5(isLifeline) { return validateGenericSlots(isLifeline, '.fixed-slot', 'expectedCat', 'categoryId'); }
+        function checkQ6(isLifeline) { return validateQ6_Table(isLifeline); }
+        function checkQ7_GenerationSlots(isLifeline) { return validateGenericSlots(isLifeline, '.gen-target-slot', 'expectedCat', 'categoryId'); }
+        function checkQ8_TechMatch(isLifeline) { return validateGenericSlots(isLifeline, '.q8-target-slot', 'expectedValue', 'correctValue'); }
+
+        function checkCurrentAnswer(isLifeline) {
+            const qType = quizData[currentQuestionIndex].type;
+            let errorCount = 0;
+            if (qType === 'drag_and_drop') errorCount = validateQ1(isLifeline);
+            else if (qType === 'table_selection') errorCount = validateQ2(isLifeline);
+            else if (qType === 'dnd_units_reverse') errorCount = checkQ3_UnitMatching(isLifeline);
+            else if (qType === 'category_bucket') errorCount = checkQ4(isLifeline);
+            else if (qType === 'category_slots') errorCount = checkQ5(isLifeline);
+            else if (qType === 'table_sort_random') errorCount = checkQ6(isLifeline);
+            else if (qType === 'category_slots_gen') errorCount = checkQ7_GenerationSlots(isLifeline);
+            else if (qType === 'drag_and_drop_2col') errorCount = checkQ8_TechMatch(isLifeline);
+
+            if (!isLifeline) {
+                if (errorCount === 0) {
+                    showMessage("太棒了！完全正確！", "bg-green-500");
+                    questionStatuses[currentQuestionIndex] = 1;
+                    const nextBtn = document.getElementById('next-btn');
+                    nextBtn.classList.add('animate-pulse', 'shadow-xl');
+                    setTimeout(() => nextBtn.classList.remove('animate-pulse', 'shadow-xl'), 1000);
+                } else {
+                    showMessage(`還有 ${errorCount} 個錯誤喔！`, "bg-yellow-500");
+                    questionStatuses[currentQuestionIndex] = 0;
+                }
+            } 
+        }
+
+        function useLifeline(id) {
+            if (lifelines > 0) {
+                const btn = document.getElementById(`lifeline-${id}`);
+                if (!btn.classList.contains('used')) {
+                    btn.classList.add('used');
+                    lifelines--;
+                    checkCurrentAnswer(true); 
+                }
+            } else { showMessage("急救包用光了！", "bg-gray-500"); }
+        }
+        function updateLifelineUI() {
+            for(let i=1; i<=3; i++) {
+                const btn = document.getElementById(`lifeline-${i}`);
+                if (btn) {
+                    if (i > lifelines) { if(!btn.classList.contains('used')) btn.classList.add('used'); } else { btn.classList.remove('used'); }
+                }
+            }
+        }
+        function showResults() {
+            let finalScore = 0;
+            quizData.forEach((q, index) => { if (questionStatuses[index] === 1) finalScore++; });
+            const total = quizData.length;
+            const endTime = Date.now();
+            const durationSeconds = Math.floor((endTime - quizStartTime) / 1000);
+            const minutes = Math.floor(durationSeconds / 60);
+            const seconds = durationSeconds % 60;
+            const timeString = `${minutes}分 ${seconds}秒`;
+            document.getElementById('question-display').classList.add('hidden');
+            document.getElementById('result-display').classList.remove('hidden');
+            document.getElementById('attempt-count').textContent = attemptCount;
+            document.getElementById('time-taken').textContent = timeString;
+            document.getElementById('final-score-number').textContent = finalScore;
+            document.getElementById('final-score-text').textContent = `滿分是 ${total} 題`;
+            let message = "";
+            if(finalScore === total) message = "太神啦！完美滿分！🏆";
+            else if(finalScore >= total*0.6) message = "很棒喔！繼續保持！🌟";
+            else message = "再加油！📚";
+            document.getElementById('final-message').textContent = message;
+        }
+        function restartQuiz() { document.getElementById('result-display').classList.add('hidden'); startQuiz(); }
+    </script>
+</body>
+</html>
