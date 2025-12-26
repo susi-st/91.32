@@ -1,1012 +1,691 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>系統平台複習小測驗</title>
+    <title>新興系統平台 - 課後總複習</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Fredoka', '微軟正黑體', sans-serif; background-color: #fce7f3; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; overflow-x: hidden; }
-        .quiz-desktop-container { width: 100%; max-width: 1000px; min-height: 80vh; background-color: #ffffff; border-radius: 20px; padding: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
-        .content-container { padding: 0; display: flex; flex-direction: column; justify-content: flex-start; flex: 1; }
-        #message-box.opacity-100 { top: 4rem; position: fixed; z-index: 100; }
-        
-        .drag-item { cursor: grab; display: inline-flex; align-items: center; justify-content: center; border-radius: 12px; font-weight: 600; box-shadow: 0 3px 0 rgba(0,0,0,0.2); border: 2px solid; transition: all 0.15s; touch-action: none; background-color: white; user-select: none; z-index: 10; }
-        .dragging { opacity: 0.5; transform: scale(0.9); cursor: grabbing; }
-        
-        /* Q1 */
-        .q1-slot { display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; margin: 0 5px; height: 60px; background-image: linear-gradient(to right, #a855f7 0%, #a855f7 70%, transparent 70%, transparent 100%); background-size: 50px 3px; background-repeat: repeat-x; background-position: bottom left; border-radius: 4px; transition: all 0.2s; }
-        .q1-slot.drag-over { background-color: #f3e8ff; border-radius: 8px; }
-        .q1-slot.filled { background-image: none; }
-        .q1-word-item { font-size: 1.5rem; height: 100%; width: auto; min-width: 80px; padding: 0 1.5rem; }
+        :root {
+            --macaron-pink: #FFB7B2;
+            --macaron-orange: #FFDAC1;
+            --macaron-yellow: #FFF9B1;
+            --macaron-green: #B5EAD7;
+            --macaron-blue: #C7CEEA;
+            --macaron-purple: #E0BBE4;
+            --macaron-mint: #E2F0CB;
+        }
 
-        /* General Slot */
-        .category-target { min-height: 120px; padding: 1rem; border: 3px dashed; border-radius: 16px; transition: all 0.2s; }
-        .category-target.drag-over { transform: scale(1.05); background-color: rgba(255, 255, 255, 0.7) !important; border-style: solid; }
-        .category-item { width: 110px; height: 100px; flex-shrink: 0; margin: 4px; font-size: 0.9rem; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0.5rem; }
-        .category-item .emoji { font-size: 1.5rem; margin-bottom: 4px; }
-        
-        .category-target .item-container .category-item, .fixed-slot .drag-item, .fixed-slot .category-item, .q1-slot .drag-item, .unit-match-slot .drag-item, .gen-target-slot .drag-item, .q8-target-slot .drag-item { width: 100% !important; height: 100% !important; margin: 0 !important; padding: 0; border: none; box-shadow: none; background: transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 8px; }
-        
-        .fixed-slot { width: 100px; height: 100px; border: 3px dashed #cbd5e1; border-radius: 12px; background-color: #f1f5f9; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; margin: 5px; }
-        .fixed-slot.drag-over { background-color: #e0e7ff; border-color: #6366f1; transform: scale(1.05); }
+        body {
+            font-family: 'Fredoka', 'Noto Sans TC', sans-serif;
+            background-color: #fef2f2;
+            overflow-x: hidden;
+        }
 
-        /* Q4 Unit Match */
-        .unit-match-item { width: auto; padding: 10px; }
-        .unit-match-unit { height: 120px; padding: 10px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .unit-match-slot { width: 95%; height: 60px; border: 2px dashed rgba(255, 255, 255, 0.7); border-radius: 8px; background-color: rgba(255, 255, 255, 0.4); margin-top: 5px; }
-        .unit-match-slot.drag-over { background-color: rgba(255, 255, 255, 0.8); }
-        .unit-title { font-weight: bold; font-size: 1.2rem; margin-bottom: 5px; color: #374151; }
+        .main-card {
+            max-width: 1000px;
+            min-height: 85vh;
+            border-radius: 40px;
+            box-shadow: 0 25px 50px -12px rgba(244, 114, 182, 0.12);
+        }
 
-        /* Q3 Bucket/Desc */
-        .q3-desc-box { border: 2px solid #e5e7eb; border-radius: 12px; padding: 15px; background-color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: space-between; height: 100%; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .q3-desc-text { font-size: 0.95rem; color: #4b5563; margin-bottom: 10px; text-align: center; font-weight: bold; }
+        .macaron-btn {
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+        }
 
-        /* Q6 */
-        .q5-speed-title { font-size: 1.5rem; font-weight: 800; color: #10b981; text-align: center; margin: 0 10px; flex-shrink: 0; line-height: 1.2; }
-        .q5-row { display: flex; align-items: center; justify-content: center; margin-bottom: 1rem; padding: 10px 0; }
-        .q5-slots { display: flex; gap: 15px; flex-grow: 1; justify-content: center; align-items: center; }
+        .macaron-btn:active {
+            transform: scale(0.95);
+        }
 
-        /* Q7 */
-        .gen-table-layout { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px 5px; width: 100%; margin-top: 20px; }
-        .gen-column { display: flex; flex-direction: column; align-items: center; background-color: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #e5e7eb; }
-        .gen-header { width: 100%; padding: 15px 0; text-align: center; font-weight: bold; color: white; font-size: 1.1rem; }
-        .gen-body { padding: 20px 10px; display: flex; justify-content: center; align-items: center; width: 100%; min-height: 100px; background-color: #f9fafb; }
-        .gen-target-slot { width: 140px; height: 70px; border: 2px dashed #9ca3af; background-color: white; }
+        .slot {
+            transition: all 0.3s ease;
+            min-height: 3.2rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            vertical-align: middle;
+            background: #f8fafc;
+            border: 2px dashed #e2e8f0;
+            font-weight: bold;
+            position: relative;
+            margin: 0 0.4rem;
+            border-radius: 12px;
+            padding: 4px;
+        }
 
-        /* Q2 Checkbox */
-        .table-check-container { width: 100%; border-collapse: separate; border-spacing: 0; overflow: hidden; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .table-check-container th { background-color: #f9a8d4; color: white; font-weight: 600; padding: 12px 10px; text-align: center; transition: background-color 0.3s; }
-        .table-check-container td:first-child { font-weight: bold; color: #4b5563; text-align: left; width: 30%; transition: all 0.3s; }
-        .table-check-container td { background-color: #fff; border-bottom: 1px solid #fce7f3; padding: 10px; text-align: center; transition: background-color 0.3s; }
-        .check-box-wrapper { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
-        .check-box { width: 32px; height: 32px; border: 2px solid #a855f7; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; background-color: #f3e8ff; }
-        .check-box.checked { background-color: #a855f7; border-color: #a855f7; transform: scale(1.05); }
-        .check-mark { color: white; font-size: 20px; line-height: 1; transition: opacity 0.15s; }
+        .slot.drag-over {
+            background: rgba(244, 114, 182, 0.08);
+            border-color: #f472b6;
+        }
 
-        .lifeline-btn { font-size: 1.5rem; cursor: pointer; transition: all 0.2s; filter: grayscale(0%); opacity: 1; }
-        .lifeline-btn:hover { transform: scale(1.2); }
-        .lifeline-btn.used { filter: grayscale(100%); opacity: 0.3; cursor: not-allowed; transform: scale(0.9); }
-        
-        input:checked + label { transform: translateY(4px); box-shadow: none !important; }
-        .shadow-3d { box-shadow: 0 4px 0 rgba(0,0,0,0.15); }
-        .shadow-3d:active { box-shadow: 0 0 0 rgba(0,0,0,0.15); transform: translateY(4px); }
+        /* 勾選/多選題專用樣式 */
+        .grid-option, .select-option {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid #f1f5f9;
+        }
+        .grid-option.selected, .select-option.selected {
+            background-color: var(--macaron-pink) !important;
+            border-color: #fb7185;
+            color: #881337;
+            font-weight: bold;
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 10px 15px -3px rgba(251, 113, 133, 0.3);
+        }
+
+        .fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .progress-circle {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: all 0.4s ease;
+            background-color: white;
+            border: 2px solid #f1f5f9;
+            color: #cbd5e1;
+        }
+        .progress-circle.passed {
+            background-color: #f472b6;
+            border-color: #f472b6;
+            color: white;
+            box-shadow: 0 4px 10px rgba(244, 114, 182, 0.2);
+        }
+
+        /* 顏色類別 */
+        .color-0 { background-color: var(--macaron-pink); }
+        .color-1 { background-color: var(--macaron-orange); }
+        .color-2 { background-color: var(--macaron-yellow); }
+        .color-3 { background-color: var(--macaron-green); }
+        .color-4 { background-color: var(--macaron-blue); }
+        .color-5 { background-color: var(--macaron-purple); }
+        .color-6 { background-color: var(--macaron-mint); }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen p-4">
 
-    <div id="quiz-container" class="quiz-desktop-container">
-        <div class="content-container"> 
-            <header class="mb-6 text-center flex justify-between items-center">
-                <div class="inline-block bg-white px-6 py-2 rounded-full shadow-sm">
-                    <span class="text-pink-500 font-bold tracking-wider">UNIT 1 REVIEW</span>
+    <div id="quiz-app" class="main-card bg-white w-full flex flex-col relative overflow-hidden">
+        
+        <!-- 上方標題列 -->
+        <header class="px-8 md:px-12 pt-8 pb-5 flex flex-wrap gap-4 justify-between items-center bg-rose-50/30">
+            <div class="flex flex-col">
+                <div class="flex items-center flex-wrap gap-4">
+                    <h1 class="text-2xl md:text-3xl font-black text-rose-400">✨ 新興系統平台</h1>
+                    <div id="status-indicators" class="flex gap-2 ml-2">
+                        <!-- JS 生成進度點 -->
+                    </div>
                 </div>
-                <h1 class="text-3xl md:text-4xl font-bold text-gray-800 drop-shadow-sm absolute left-1/2 transform -translate-x-1/2">
-                    💻 系統平台小測驗
-                </h1>
-                <div class="w-20"></div>
-            </header>
-
-            <div id="start-screen" class="text-center flex-1 flex flex-col justify-center items-center h-full">
-                <div class="bg-white p-8 rounded-[3rem] shadow-xl mb-8 w-64 h-64 flex items-center justify-center border-4 border-pink-200 animate-bounce">
-                    <span class="text-8xl">🚀</span>
-                </div>
-                <h2 class="text-2xl md:text-3xl font-bold mb-3 text-gray-700">準備好了嗎？</h2>
-                <p class="text-lg text-gray-500 mb-8">讓我們來複習一下課本重點吧！</p>
-                <button onclick="startQuiz()" class="w-full max-w-xs bg-gradient-to-r from-green-400 to-green-500 text-white text-2xl font-bold py-4 rounded-2xl shadow-3d hover:brightness-105 active:scale-95 transition-all">開始挑戰</button>
+                <p class="text-gray-400 text-sm mt-1">作答進度: <span id="progress-text" class="font-bold text-rose-300"></span></p>
             </div>
+            
+            <div id="timer" class="text-xl font-bold text-gray-500 bg-white px-5 py-2 rounded-full shadow-sm border border-rose-100">00:00</div>
+        </header>
 
-            <div id="question-display" class="hidden flex-1 flex flex-col">
-                <div class="bg-white rounded-3xl p-6 shadow-lg mb-6 border-l-8 border-purple-400">
-                    <div class="flex items-center mb-4">
-                        <span class="bg-purple-100 text-purple-600 px-3 py-1 rounded-lg font-bold text-sm mr-2">QUESTION</span>
-                        <span id="question-number" class="text-2xl font-bold text-purple-600"></span>
-                    </div>
-                    <div id="question-text-wrapper" class="text-xl md:text-2xl font-bold text-gray-800 leading-relaxed">
-                        <p id="question-text"></p>
-                    </div>
-                </div>
+        <!-- 主內容區 -->
+        <main id="question-container" class="flex-grow px-8 md:px-16 py-8 md:py-10 overflow-y-auto">
+            <!-- 題目由 JS 注入 -->
+        </main>
 
-                <div id="options-container" class="space-y-4 mb-8 flex-1"></div>
+        <!-- 下方導覽列 -->
+        <footer class="p-6 md:p-8 bg-slate-50/50 flex flex-wrap gap-4 justify-between items-center z-[200]">
+            <button id="prev-btn" class="px-8 py-3 rounded-full border-2 border-rose-100 text-rose-300 font-bold hover:bg-rose-50 disabled:opacity-20 transition-all">
+                上一題
+            </button>
+            
+            <div class="flex items-center gap-4">
+                <button id="check-btn" class="px-10 py-4 bg-rose-400 text-white rounded-full font-black shadow-lg shadow-rose-100 hover:bg-rose-500 transition-all active:scale-95">
+                    檢查答案
+                </button>
+                <button id="next-btn" class="px-10 py-3 rounded-full bg-indigo-400 text-white font-bold hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-100 disabled:bg-gray-300">
+                    下一題
+                </button>
+            </div>
+        </footer>
 
-                <div class="mt-auto pt-4 flex justify-between items-center relative">
-                    <button id="prev-btn" onclick="prevQuestion()" class="px-4 py-2 bg-gray-300 rounded-xl shadow-md hover:bg-gray-400 transition text-gray-800 font-bold" disabled>上一題</button>
-                    <div class="flex items-center gap-4">
-                        <button onclick="checkCurrentAnswer(false)" class="bg-gray-800 text-white text-lg font-bold py-3 px-8 rounded-xl shadow-3d hover:bg-gray-700 active:scale-95 transition-all flex items-center justify-center">
-                            <span>確認答案</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
-                        </button>
-                        <div id="lifeline-container" class="flex gap-2 bg-red-50 p-2 rounded-lg border border-red-100" title="使用急救包顯示錯誤 (剩餘次數)">
-                            <div id="lifeline-1" class="lifeline-btn" onclick="useLifeline(1)">🚑</div>
-                            <div id="lifeline-2" class="lifeline-btn" onclick="useLifeline(2)">🚑</div>
-                            <div id="lifeline-3" class="lifeline-btn" onclick="useLifeline(3)">🚑</div>
-                        </div>
-                    </div>
-                    <button id="next-btn" onclick="nextQuestion()" class="px-4 py-2 bg-purple-500 text-white rounded-xl shadow-md hover:bg-purple-600 transition font-bold">下一題</button>
+        <!-- 彈窗 -->
+        <div id="modal-overlay" class="fixed inset-0 bg-black/40 z-[300] flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
+            <div class="bg-white rounded-[40px] p-10 max-w-sm w-full shadow-2xl transform scale-90 transition-transform duration-300" id="modal-content">
+                <div class="text-5xl mb-6 text-center">💡</div>
+                <h3 id="modal-title" class="text-2xl font-black text-gray-800 text-center mb-3">溫馨提醒</h3>
+                <p id="modal-message" class="text-gray-500 text-center mb-8 leading-relaxed"></p>
+                <div class="flex gap-4 justify-center">
+                    <button onclick="closeModal()" class="px-8 py-2 border-2 border-gray-100 text-gray-400 font-bold rounded-full hover:bg-gray-50 transition-all">返回</button>
+                    <button id="modal-confirm-btn" class="px-8 py-2 bg-indigo-400 text-white font-bold rounded-full shadow-lg hover:bg-indigo-500 transition-all active:scale-95">確認</button>
                 </div>
             </div>
+        </div>
 
-            <div id="result-display" class="hidden text-center flex-1 flex flex-col justify-center items-center">
-                <div class="bg-white p-8 rounded-3xl shadow-xl w-full max-w-sm border-4 border-dashed border-gray-300">
-                    <div id="result-icon" class="text-8xl mb-4">🎉</div>
-                    <h2 id="final-message" class="text-3xl font-extrabold mb-2"></h2>
-                    <div class="my-6 space-y-2">
-                        <div class="text-xl text-gray-600">作答次數：<span id="attempt-count" class="font-bold text-purple-600 text-2xl"></span></div>
-                        <div class="text-xl text-gray-600">作答時間：<span id="time-taken" class="font-bold text-blue-600 text-2xl"></span></div>
-                        <div class="mt-4">
-                            <span class="text-gray-400 text-sm uppercase tracking-widest">Score</span>
-                            <div class="text-6xl font-bold text-gray-800" id="final-score-number"></div>
-                            <p id="final-score-text" class="text-gray-500 mt-2"></p>
-                        </div>
-                    </div>
-                    <button onclick="restartQuiz()" class="w-full bg-yellow-400 text-yellow-900 text-xl font-bold py-3 rounded-xl shadow-3d hover:bg-yellow-300 active:scale-95 transition-all">再玩一次</button>
+        <!-- 結算頁面 -->
+        <div id="result-overlay" class="absolute inset-0 bg-white z-[500] flex flex-col items-center justify-center p-6 hidden fade-in overflow-y-auto">
+            <div class="border-4 border-rose-100 rounded-[50px] p-10 max-w-2xl w-full bg-white shadow-2xl my-8">
+                <h2 class="text-4xl font-black text-rose-400 mb-8 text-center">🏆 測驗完成！</h2>
+                <div id="final-stats" class="space-y-6 mb-10"></div>
+                <div class="bg-indigo-50 p-8 rounded-[30px] mb-10 text-center border border-indigo-100">
+                    <div id="quote-zh" class="text-xl font-bold text-indigo-500 mb-4"></div>
+                    <div id="quote-en" class="text-sm italic text-indigo-300 leading-relaxed"></div>
+                </div>
+                <div class="flex justify-center">
+                    <button onclick="restartQuiz()" class="px-16 py-5 bg-rose-400 text-white rounded-full text-2xl font-black shadow-2xl hover:bg-rose-500 transition-all active:scale-95">
+                        重新挑戰
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <script type="text/javascript">
-        // --- 1. Variables & Helpers ---
-        let currentQuestionIndex = 0;
-        let questionStatuses = [];
-        let quizState = {};
-        let answers = {};
-        let quizStartTime = null;
-        let attemptCount = 0;
-        let lifelines = 3;
+    <div id="toast" class="fixed bottom-12 left-1/2 -translate-x-1/2 px-10 py-5 rounded-full bg-slate-800 text-white font-bold opacity-0 transition-opacity pointer-events-none z-[600] text-xl shadow-2xl"></div>
 
-        const colorPalettes = [
-            { bg: 'bg-red-100', border: 'border-red-400', text: 'text-red-800', hex: '#fee2e2' }, 
-            { bg: 'bg-orange-100', border: 'border-orange-400', text: 'text-orange-800', hex: '#ffedd5' }, 
-            { bg: 'bg-green-100', border: 'border-green-400', text: 'text-green-800', hex: '#d1fae5' }, 
-            { bg: 'bg-blue-100', border: 'border-blue-400', text: 'text-blue-800', hex: '#dbeafe' }, 
-            { bg: 'bg-purple-100', border: 'border-purple-400', text: 'text-purple-800', hex: '#f3e8ff' }, 
-            { bg: 'bg-pink-100', border: 'border-pink-400', text: 'text-pink-800', hex: '#fce7f3' }, 
-            { bg: 'bg-teal-100', border: 'border-teal-400', text: 'text-teal-800', hex: '#ccfbf1' } 
-        ];
-
-        // --- VALIDATORS ---
-        function validateQ1(showVisuals) {
-            let errorCount = 0;
-            const slots = document.querySelectorAll('.q1-slot');
-            slots.forEach(slot => { 
-                slot.style.border = '2px dashed #a855f7'; 
-                slot.style.backgroundImage = 'linear-gradient(to right, #a855f7 0%, #a855f7 70%, transparent 70%, transparent 100%)'; 
-                if(slot.firstElementChild) slot.firstElementChild.style.backgroundColor = '';
-            });
-            slots.forEach(slot => {
-                const expectedWord = slot.dataset.answer;
-                const item = slot.firstElementChild;
-                if (item) {
-                    if (item.dataset.value !== expectedWord) {
-                        errorCount++;
-                        if(showVisuals) { slot.style.border = '2px solid #ef4444'; item.style.backgroundColor = '#fca5a5'; slot.style.backgroundImage = 'none'; }
-                    } else if (showVisuals) { slot.style.border = '2px solid #22c55e'; item.style.backgroundColor = '#dcfce7'; slot.style.backgroundImage = 'none'; }
-                } else {
-                    errorCount++;
-                    if(showVisuals) slot.style.border = '2px dashed #ef4444';
-                }
-            });
-            return errorCount;
-        }
-
-        function validateQ2(showVisuals) {
-            let errorCount = 0;
-            const userAnswers = answers[currentQuestionIndex] || {};
-            const rows = document.querySelectorAll('.table-check-container tbody tr');
-            rows.forEach(tr => {
-                const nameCell = tr.querySelector('td:first-child');
-                nameCell.style.backgroundColor = nameCell.dataset.initialColor;
-                tr.querySelectorAll('td:not(:first-child)').forEach(td => { td.style.backgroundColor = td.dataset.columnColor; });
-            });
-            quizData[currentQuestionIndex].platformData.forEach(platform => {
-                const expected = platform.classification;
-                const userSelected = userAnswers[platform.name];
-                const row = Array.from(rows).find(r => r.querySelector('td:first-child').textContent === platform.name);
-                if (!row) return;
-                const nameCell = row.querySelector('td:first-child');
-                const clickedCell = userSelected !== undefined && userSelected !== -1 ? row.querySelector(`td[data-classification-id="${userSelected}"]`) : null;
-                if (userSelected !== undefined && userSelected !== -1) {
-                     if (userSelected !== expected) {
-                         errorCount++;
-                         if(showVisuals) {
-                             nameCell.style.backgroundColor = '#fca5a5'; 
-                             if (clickedCell) clickedCell.style.backgroundColor = '#fca5a5';
-                             const correctCell = row.querySelector(`td[data-classification-id="${expected}"]`);
-                             if(correctCell) correctCell.style.backgroundColor = '#fef08a';
-                         }
-                     }
-                } else { errorCount++; }
-            });
-            return errorCount;
-        }
-
-        function validateGenericSlots(showVisuals, slotSelector, datasetKeyExpected, datasetKeyActual) {
-            let errorCount = 0;
-            const slots = document.querySelectorAll(slotSelector);
-            slots.forEach(slot => {
-                slot.style.borderColor = slotSelector.includes('category-target') ? '' : (slotSelector.includes('q1') ? '' : '#cbd5e1'); 
-                const item = slotSelector.includes('item-container') ? slot.firstElementChild : (slot.children.length > 0 ? slot.firstElementChild : null);
-                if(item) item.style.borderColor = item.dataset.initialBorderColor || '';
-                if (item) {
-                    if (item.dataset[datasetKeyActual] !== slot.dataset[datasetKeyExpected]) {
-                        errorCount++;
-                        if(showVisuals) {
-                            if(slot.classList.contains('category-target')) { item.style.borderColor = 'red'; } 
-                            else { slot.style.borderColor = 'red'; item.style.borderColor = 'red'; }
-                        }
-                    } else if (showVisuals) { slot.style.borderColor = '#22c55e'; }
-                } else {
-                    errorCount++; 
-                    if(showVisuals) slot.style.borderColor = 'red';
-                }
-            });
-            return errorCount;
-        }
-        function validateQ6_Table(showVisuals) { return validateGenericSlots(showVisuals, '.q5-target-slot', 'correctType', 'typeId'); }
-        function validateQ3_Bucket(showVisuals) { // For Q3 Bucket
-             let errorCount = 0;
-             const items = document.querySelectorAll('#q3-source ~ .grid .category-item'); 
-             items.forEach(item => {
-                const bucket = item.closest('.category-target');
-                if(showVisuals) item.style.borderColor = item.dataset.initialBorderColor || '';
-                if (!bucket || bucket.dataset.categoryId !== item.dataset.categoryId) {
-                    errorCount++;
-                    if(showVisuals) item.style.borderColor = 'red';
-                } else if (showVisuals) { item.style.borderColor = '#22c55e'; }
-             });
-             if (document.getElementById('q3-source').children.length > 0) errorCount += document.getElementById('q3-source').children.length;
-             return errorCount;
-        }
-
-
-        // --- Data ---
+    <script>
         const quizData = [
             {
-                type: 'drag_and_drop', // Q1
-                question: "系統平台又稱[__]平臺，指的是利用電腦的[__]，來提供使用者各項[__]的[__]。",
-                blanks: ["運算", "運算能力", "服務", "執行環境"], 
-                options: ["運算", "運算能力", "服務", "執行環境"], 
+                type: 'drag_and_drop',
+                question: "西元2007年，[__] 發表第一代 [__]，誕生第一台智慧型手機；隔年 [__] 與HTC合作，推出第一部 [__] 系統的手機。",
+                blanks: ["蘋果公司", "iPhone", "Google", "Android"],
+                options: ["蘋果公司", "iPhone", "Google", "Android"]
             },
             {
-                type: 'table_selection', // Q2
-                question: "請勾選下列四種平台是屬於哪一類的平台",
-                columns: ["平台種類", "傳統系統平台", "新興系統平台"],
-                platformData: [
-                    { name: "電腦系統平台", classification: 0 },
-                    { name: "可攜式系統平台", classification: 1 },
-                    { name: "雲端系統平台", classification: 1 },
-                    { name: "嵌入式系統平台", classification: 1 },
-                ]
-            },
-             {
-                type: 'category_bucket', // Q3: 應用實例 (Swapped, was Q4)
-                question: "請將上方的實際應用範例，拖曳至下方的正確系統平台分類中。",
-                categories: [
-                    { name: "電腦系統平台", id: 'traditional', color: 'border-orange-400 bg-orange-50' },
-                    { name: "可攜式系統平台", id: 'portable', color: 'border-blue-400 bg-blue-50' },
-                    { name: "雲端系統平台", id: 'cloud', color: 'border-green-400 bg-green-50' },
-                    { name: "嵌入式系統平台", id: 'embedded', color: 'border-purple-4个 bg-purple-50' }
-                ],
+                type: 'matching_list',
+                question: "請根據下方功能敘述，將正確的硬體平台拖入對應區塊：",
+                options: ["智慧型手錶", "智慧型眼鏡"],
                 items: [
-                    { name: "筆記型電腦", categoryId: 'traditional', emoji: '💻' },
-                    { name: "智慧型手機", categoryId: 'portable', emoji: '📱' },
-                    { name: "Gmail", categoryId: 'cloud', emoji: '📧' },
-                    { name: "全自動洗衣機", categoryId: 'embedded', emoji: '🧺' }
+                    { label: "可以隨時量測個人的步行數量、心率及運動狀態", answer: "智慧型手錶" },
+                    { label: "可以進行識物學習、判斷和動作預測", answer: "智慧型眼鏡" }
                 ]
             },
             {
-                type: 'dnd_units_reverse', // Q4: 五大單元配對 (Swapped, was Q3)
-                question: "請將上方的五大單元名稱，拖曳至下方對應的功能描述方框中。",
-                units: [
-                    { name: "輸入單元", unitId: 'input', emoji: '📥', color: {bg: '#fee2e2', border: '#fca5a5'} },
-                    { name: "輸出單元", unitId: 'output', emoji: '📤', color: {bg: '#d1fae5', border: '#86efac'} },
-                    { name: "記憶單元", unitId: 'memory', emoji: '💾', color: {bg: '#ffedd5', border: '#fdbd83'} },
-                    { name: "控制單元", unitId: 'control', emoji: '🎮', color: {bg: '#dbeafe', border: '#93c5fd'} },
-                    { name: "算術與邏輯單元", unitId: 'alu', emoji: '➕', color: {bg: '#f3e8ff', border: '#d8b4fe'} }
-                ],
-                descriptions: [
-                    { text: "讓使用者可以傳送資料給系統的設備", unitId: 'input', color: 'bg-red-100 border-red-300' },
-                    { text: "讓系統能把運算結果傳達給使用者的設備", unitId: 'output', color: 'bg-green-100 border-green-300' },
-                    { text: "可做為暫時或永久儲存資訊的設備", unitId: 'memory', color: 'bg-yellow-100 border-yellow-300' },
-                    { text: "負責協調各單元之間的工作", unitId: 'control', color: 'bg-blue-100 border-blue-300' },
-                    { text: "進行資料的計算與處理", unitId: 'alu', color: 'bg-purple-100 border-purple-300' }
-                ]
-            },
-            {
-                type: 'category_slots', // Q5: I/O 
-                question: "請將下列週邊設備，拖曳至正確的電腦單元分類格子中 (一格一個)。",
-                categories: [
-                    { name: "輸入單元 (Input)", id: 'input', color: 'border-pink-400 bg-pink-100', slots: 4 },
-                    { name: "輸出單元 (Output)", id: 'output', color: 'border-cyan-400 bg-cyan-100', slots: 4 }
-                ],
+                type: 'matching_list',
+                question: "請將下列雲端服務模型正確分類：",
+                options: ["基礎設施即服務(Iaas)", "平臺即服務(Paas)", "軟體即服務(SaaS)"],
                 items: [
-                    { name: "攝影機", categoryId: 'input', emoji: '🎥' },
-                    { name: "鍵盤", categoryId: 'input', emoji: '⌨️' },
-                    { name: "滑鼠", categoryId: 'input', emoji: '🖱️' },
-                    { name: "麥克風", categoryId: 'input', emoji: '🎤' },
-                    { name: "耳機", categoryId: 'output', emoji: '🎧' }, 
-                    { name: "喇叭", categoryId: 'output', emoji: '🔊' },
-                    { name: "印表機", categoryId: 'output', emoji: '🖨️' },
-                    { name: "螢幕", categoryId: 'output', emoji: '🖥️' }
+                    { label: "由硬體及網路設備形成的雲端虛擬主機", answer: "基礎設施即服務(Iaas)" },
+                    { label: "提供網站開發環境與工具", answer: "平臺即服務(Paas)" },
+                    { label: "提供各項網頁服務，如電子郵件", answer: "軟體即服務(SaaS)" }
                 ]
             },
             {
-                type: 'table_sort_random', // Q6: 記憶體階層
-                question: "請依據指定條件，將記憶體種類拖曳至表格中的正確位置。",
-                variations: [
-                    { labelStart: "存取速度", labelEnd: "快 ⮕ 慢", type: "speed_fast_slow", order: ["register", "cache", "ram", "secondary"] },
-                    { labelStart: "存取速度", labelEnd: "慢 ⮕ 快", type: "speed_slow_fast", order: ["secondary", "ram", "cache", "register"] },
-                    { labelStart: "價格", labelEnd: "高 ⮕ 低", type: "price_high_low", order: ["register", "cache", "ram", "secondary"] },
-                    { labelStart: "價格", labelEnd: "低 ⮕ 高", type: "price_low_high", order: ["secondary", "ram", "cache", "register"] },
-                    { labelStart: "容量", labelEnd: "大 ⮕ 小", type: "cap_large_small", order: ["secondary", "ram", "cache", "register"] },
-                    { labelStart: "容量", labelEnd: "小 ⮕ 大", type: "cap_small_large", order: ["register", "cache", "ram", "secondary"] }
-                ],
-                sourceItems: [
-                    { id: 'register', name: "暫存器", emoji: "⚡" },
-                    { id: 'cache', name: "快取記憶體", emoji: "🚅" },
-                    { id: 'ram', name: "隨機存取記憶體", emoji: "🧠" },
-                    { id: 'secondary', name: "輔助記憶體", emoji: "💾" }
+                type: 'matching_list',
+                question: "請針對雲端服務的不同受益對象，進行正確的特色配對：",
+                options: ["一般使用者", "軟體、系統開發者", "企業或公司"],
+                items: [
+                    { label: "不必安裝軟體，只要連上網就能使用", answer: "一般使用者" },
+                    { label: "不用管理網站或主機，直接租用應用程式介面", answer: "軟體、系統開發者" },
+                    { label: "省下買主機、網路設備、授權的開銷", answer: "企業或公司" }
                 ]
             },
             {
-                 type: 'category_slots_gen', // Q7: 電腦元件發展史
-                 question: "請將下方的電腦主要元件，拖曳到對應的電腦世代。",
-                 categories: [
-                    { name: "第一代", id: 'gen1', color: 'bg-red-500', slots: 1 },
-                    { name: "第二代", id: 'gen2', color: 'bg-orange-500', slots: 1 },
-                    { name: "第三代", id: 'gen3', color: 'bg-yellow-500', slots: 1 },
-                    { name: "第四代", id: 'gen4', color: 'bg-green-500', slots: 1 },
-                    { name: "第五代", id: 'gen5', color: 'bg-blue-500', slots: 1 }
-                 ],
-                 items: [
-                     { name: "積體電路 (IC)", categoryId: 'gen3', emoji: '🔸' },
-                     { name: "真空管", categoryId: 'gen1', emoji: '💡' },
-                     { name: "超大型積體電路 (VLSI)", categoryId: 'gen4', emoji: '🔺' },
-                     { name: "電晶體", categoryId: 'gen2', emoji: '🔘' },
-                     { name: "小元件、多核心", categoryId: 'gen5', emoji: '🌐' }
-                 ]
+                type: 'grid_selection',
+                question: "嵌入式系統平台的特色何者為是？",
+                headers: ["特性項目", "選項 A", "選項 B"],
+                rows: [
+                    { label: "執行的工作", options: ["預先設定", "未經設定"], answer: 0 },
+                    { label: "控制/運算單元", options: ["簡易", "複雜"], answer: 0 },
+                    { label: "運作電力", options: ["節能", "耗能"], answer: 0 }
+                ]
             },
             {
-                 type: 'drag_and_drop_2col', // Q8: 英文縮寫
-                 question: "請將上半部的英文縮寫，拖曳到下方正確的中文名稱內。",
-                 leftItems: [
-                     { name: "Big Data", value: 'big_data' },
-                     { name: "AI", value: 'ai' },
-                     { name: "IoT", value: 'iot' }
-                 ],
-                 rightItems: [
-                     { name: "人工智慧", correctValue: 'ai' },
-                     { name: "物聯網", correctValue: 'iot' },
-                     { name: "大數據", correctValue: 'big_data' }
-                 ]
+                type: 'multi_select',
+                question: "請點擊屬於「嵌入式系統平臺」的設備",
+                options: [
+                    { text: "掃地機器人", correct: true },
+                    { text: "洗衣機", correct: true },
+                    { text: "冷氣機", correct: true },
+                    { text: "YouBike 2.0", correct: true },
+                    { text: "筆記型電腦", correct: false },
+                    { text: "平板", correct: false },
+                    { text: "Gmail", correct: false },
+                    { text: "電動公車", correct: false }
+                ]
             }
         ];
 
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
+        const inspirationalQuotes = [
+            { en: "Stay hungry, stay foolish.", zh: "求知若渴，虛心若愚。 — 賈伯斯" },
+            { en: "Action is the foundational key to all success.", zh: "行動是所有成功的基石。 — 畢卡索" },
+            { en: "Believe you can and you're halfway there.", zh: "相信你自己能做到，你就已經成功了一半。 — 羅斯福" }
+        ];
+
+        let currentIdx = 0;
+        let userStates = {};
+        let quizCheckedStatus = {}; 
+        let quizPassedStatus = {}; 
+        let totalAttempts = 0; 
+        let quizAttemptCount = 1; 
+        let startTime = Date.now();
+        let timerInterval = null;
+        let isTimerStarted = false; 
+
+        window.onload = () => {
+            initIndicators();
+            renderQuestion();
+            setupGlobalEvents();
+            startTimer(); 
+        };
+
+        function initIndicators() {
+            const container = document.getElementById('status-indicators');
+            container.innerHTML = quizData.map((_, i) => `<div class="progress-circle" data-idx="${i}">${i+1}</div>`).join('');
         }
 
-        function showMessage(msg, bgColor) {
-            let messageBox = document.getElementById('message-box');
-            if (!messageBox) {
-                messageBox = document.createElement('div');
-                messageBox.id = 'message-box';
-                document.body.appendChild(messageBox);
-            }
-            messageBox.textContent = msg;
-            messageBox.className = `fixed top-4 left-1/2 transform -translate-x-1/2 z-50 px-8 py-4 rounded-xl shadow-2xl text-white font-bold text-lg text-center transition-all duration-300 opacity-100 scale-100 ${bgColor} border-4 border-white`;
-            setTimeout(() => { hideMessage(); }, 3000); 
+        function setupGlobalEvents() {
+            document.getElementById('next-btn').onclick = () => navigate(1);
+            document.getElementById('prev-btn').onclick = () => navigate(-1);
+            document.getElementById('check-btn').onclick = checkAnswer;
         }
 
-        function hideMessage() {
-            const box = document.getElementById('message-box');
-            if (box) { box.classList.remove('opacity-100', 'scale-100'); box.classList.add('opacity-0', 'scale-90'); }
+        function startTimer() {
+            if (isTimerStarted) return;
+            isTimerStarted = true;
+            startTime = Date.now();
+            timerInterval = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const mins = String(Math.floor(elapsed / 60)).padStart(2, '0');
+                const secs = String(elapsed % 60).padStart(2, '0');
+                const timerEl = document.getElementById('timer');
+                if (timerEl) timerEl.innerText = `${mins}:${secs}`;
+            }, 1000);
         }
 
-        function createCheckButton(platformName, columnIndex) {
-            const uniqueId = `check-${platformName}-${columnIndex}`;
-            return `<div class="check-box-wrapper"><div id="${uniqueId}" class="check-box" onclick="toggleSelection('${platformName}', ${columnIndex}, this)"><span class="check-mark opacity-0">✓</span></div></div>`;
+        function showCustomModal(title, message, confirmText, onConfirm) {
+            const overlay = document.getElementById('modal-overlay');
+            const content = document.getElementById('modal-content');
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-message').innerText = message;
+            const btn = document.getElementById('modal-confirm-btn');
+            btn.innerText = confirmText;
+            btn.onclick = () => { closeModal(); if (onConfirm) onConfirm(); };
+            overlay.classList.remove('hidden');
+            setTimeout(() => { overlay.classList.remove('opacity-0'); content.classList.remove('scale-90'); }, 10);
         }
 
-        function toggleSelection(platformName, columnIndex, element) {
-            const currentAnswer = answers[currentQuestionIndex] || {};
-            const currentlySelected = currentAnswer[platformName];
-            const row = element.closest('tr');
-            if (row) { row.querySelectorAll('.check-box').forEach(box => { box.classList.remove('checked'); box.querySelector('.check-mark').classList.add('opacity-0'); }); }
-            if (currentlySelected === columnIndex) { currentAnswer[platformName] = -1; } 
-            else { element.classList.add('checked'); element.querySelector('.check-mark').classList.remove('opacity-0'); currentAnswer[platformName] = columnIndex; }
-            answers[currentQuestionIndex] = currentAnswer;
+        function closeModal() {
+            const overlay = document.getElementById('modal-overlay');
+            const content = document.getElementById('modal-content');
+            overlay.classList.add('opacity-0'); content.classList.add('scale-90');
+            setTimeout(() => overlay.classList.add('hidden'), 300);
         }
 
-        function loadTableSelectionAnswers() {
-            const savedAnswers = answers[currentQuestionIndex] || {};
-            for (const platformName in savedAnswers) {
-                const columnIndex = savedAnswers[platformName];
-                if (columnIndex !== -1) {
-                    const uniqueId = `check-${platformName}-${columnIndex}`;
-                    const element = document.getElementById(uniqueId);
-                    if (element) { element.classList.add('checked'); element.querySelector('.check-mark').classList.remove('opacity-0'); }
-                }
-            }
-        }
-
-        function createDragItem(id, text, palette, isQ3 = false) {
-            const div = document.createElement('div');
-            div.id = id;
-            div.className = `drag-item ${palette.bg} ${palette.border} ${palette.text} shadow-sm hover:shadow-md transition-all`;
-            if (isQ3) { div.classList.add('category-item'); }
-            div.dataset.initialBorderColor = palette.border.replace('border', '#').replace('400', '600'); 
-            div.draggable = true;
-            div.ondragstart = drag;
-            div.ontouchstart = touchStart;
-            div.ontouchend = touchEnd;
-            div.textContent = text;
-            return div;
-        }
-        
-        // --- 3. Drag Handlers ---
-
-        function drag(event) {
-            event.dataTransfer.setData("text/plain", event.target.id);
-            const ds = event.target.dataset;
-            if (ds.value) event.dataTransfer.setData("value", ds.value);
-            if (ds.categoryId) event.dataTransfer.setData("categoryId", ds.categoryId);
-            if (ds.unitId) event.dataTransfer.setData("unitId", ds.unitId);
-            if (ds.typeId) event.dataTransfer.setData("typeId", ds.typeId);
-            if (ds.correctValue) event.dataTransfer.setData("correctValue", ds.correctValue);
-            setTimeout(() => { event.target.classList.add('dragging'); }, 0);
-        }
-        function allowDrop(event) { event.preventDefault(); }
-        function dragEnter(event) { event.target.closest('.drop-zone, .category-target, .fixed-slot, .q1-slot, .gen-target-slot, .unit-match-slot, .q3-desc-target, .q8-target-slot')?.classList.add('drag-over'); }
-        function dragLeave(event) { event.target.closest('.drop-zone, .category-target, .fixed-slot, .q1-slot, .gen-target-slot, .unit-match-slot, .q3-desc-target, .q8-target-slot')?.classList.remove('drag-over'); }
-        function touchStart(event) { event.target.closest('.drag-item')?.classList.add('dragging'); }
-        function touchEnd(event) { event.target.closest('.drag-item')?.classList.remove('dragging'); }
-        function touchMove(e) {} 
-        
-        function dropSlotLIFO(event) {
-            event.preventDefault();
-            const id = event.dataTransfer.getData("text/plain");
-            const el = document.getElementById(id);
-            let targetSlot = event.target.closest('.fixed-slot, .q1-slot, .unit-match-slot, .gen-target-slot, .q8-target-slot'); 
+        function renderQuestion() {
+            const container = document.getElementById('question-container');
+            const q = quizData[currentIdx];
+            const progressEl = document.getElementById('progress-text');
             
-            if (targetSlot) {
-                if (targetSlot.children.length > 0) {
-                    const oldItem = targetSlot.firstElementChild;
-                    let sourceId = '';
-                    if (currentQuestionIndex === 0) sourceId = 'q1-source';
-                    else if (currentQuestionIndex === 3) sourceId = 'q4-unit-source'; // Q4
-                    else if (currentQuestionIndex === 4) sourceId = 'q5-source'; // Q5
-                    else if (currentQuestionIndex === 5) sourceId = 'q6-source'; // Q6
-                    else if (currentQuestionIndex === 6) sourceId = 'q7-source'; // Q7
-                    else if (currentQuestionIndex === 7) sourceId = 'q8-source'; // Q8
-                    
-                    if (sourceId) {
-                        const source = document.getElementById(sourceId);
-                        if(source) {
-                            source.appendChild(oldItem);
-                            oldItem.style.margin = ''; oldItem.style.width = '';
-                            if (currentQuestionIndex === 0) oldItem.style.width = 'auto'; 
-                            if (currentQuestionIndex === 3) { oldItem.style.width = '140px'; oldItem.style.height = '80px'; } 
-                            if (currentQuestionIndex === 5) oldItem.style.width = '100px'; 
-                            if (currentQuestionIndex === 6) oldItem.style.width = '140px'; 
-                            if (currentQuestionIndex === 7) oldItem.style.width = '150px'; 
-                        }
-                    }
+            if (progressEl) progressEl.innerText = `${currentIdx + 1} / ${quizData.length}`;
+            document.getElementById('prev-btn').disabled = (currentIdx === 0);
+            document.getElementById('next-btn').innerText = (currentIdx === quizData.length - 1) ? "查看結果" : "下一題";
+
+            container.innerHTML = '';
+            const wrapper = document.createElement('div');
+            wrapper.className = 'fade-in flex flex-col items-start w-full';
+
+            if (q.type === 'drag_and_drop') renderDragAndDrop(q, wrapper);
+            else if (q.type === 'matching_list') renderMatchingList(q, wrapper);
+            else if (q.type === 'grid_selection') renderGridSelection(q, wrapper);
+            else if (q.type === 'multi_select') renderMultiSelect(q, wrapper);
+
+            container.appendChild(wrapper);
+            restoreCurrentQuestionState();
+            updateProgressIndicators();
+        }
+
+        function renderDragAndDrop(q, wrapper) {
+            const title = document.createElement('h3');
+            title.className = "text-xl md:text-2xl text-gray-700 font-bold mb-10 leading-[3.2rem] text-left w-full";
+            
+            const parts = q.question.split('[__]');
+            parts.forEach((part, i) => {
+                const textSpan = document.createElement('span'); 
+                textSpan.innerText = part; 
+                title.appendChild(textSpan);
+                if (i < parts.length - 1) {
+                    const slot = createSlot(i, q.blanks[i]);
+                    slot.style.minWidth = "140px";
+                    title.appendChild(slot);
                 }
-                if (el) {
-                    el.classList.remove('dragging');
-                    targetSlot.appendChild(el);
-                    targetSlot.classList.remove('drag-over');
-                    targetSlot.classList.add('filled');
-                    el.style.margin = '0'; el.style.width = '100%';
-                    if (currentQuestionIndex === 3) el.style.height = '100%'; 
-                }
-            } else if (el) { el.classList.remove('dragging'); }
-        }
-        
-        function dropQ3_LIFO(event) {
-            event.preventDefault();
-            const id = event.dataTransfer.getData("text/plain");
-            const el = document.getElementById(id);
-            const itemContainer = event.target.closest('.item-container');
-            const targetBucket = itemContainer ? itemContainer.closest('.category-target') : null;
-
-            if (!targetBucket) { if (el) el.classList.remove('dragging'); return; }
-            const sourceWrapper = document.getElementById('q3-source'); 
-
-            if (itemContainer && sourceWrapper) {
-                if (itemContainer.children.length > 0) {
-                    const oldItem = itemContainer.firstElementChild;
-                    oldItem.style.margin = '4px'; oldItem.style.width = '110px'; 
-                    sourceWrapper.appendChild(oldItem);
-                    oldItem.classList.remove('dragging');
-                }
-                el.classList.remove('dragging');
-                itemContainer.appendChild(el);
-                targetBucket.classList.remove('drag-over');
-                el.style.margin = '0'; el.style.width = '100%'; 
-            } else if (el) { el.classList.remove('dragging'); }
+            });
+            wrapper.appendChild(title);
+            renderSourceArea(q.options, wrapper);
         }
 
-        function loadQ1_FillBlanks(q) {
-            document.getElementById('question-text').textContent = q.question;
-            const wrapper = document.getElementById('question-text');
-            const container = document.getElementById('options-container');
-            let html = q.question;
-            q.blanks.forEach((ans, idx) => {
-                const width = ans.length === 4 ? '200px' : '100px';
-                let slotHtml = `<div id="q1-slot-${idx}" class="q1-slot" style="width:${width}" data-answer="${ans}" ondragover="allowDrop(event)" ondrop="dropSlotLIFO(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)"></div>`;
-                html = html.replace('[__]', slotHtml);
+        function renderMatchingList(q, wrapper) {
+            const title = document.createElement('h3'); 
+            title.className = "text-xl md:text-2xl text-gray-700 font-bold mb-10 text-left w-full";
+            title.innerText = q.question; 
+            wrapper.appendChild(title);
+            
+            const list = document.createElement('div'); 
+            list.className = "grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-5xl mx-auto";
+            
+            q.items.forEach((item, idx) => {
+                const itemBox = document.createElement('div');
+                const colorIdx = (idx + currentIdx) % 7;
+                itemBox.className = `color-${colorIdx} p-6 pt-4 pb-6 rounded-3xl border-2 border-white shadow-sm flex flex-col gap-4 transition-all hover:scale-[1.01]`;
+
+                const label = document.createElement('div'); 
+                label.className = "text-lg font-black text-gray-700 leading-snug";
+                label.innerText = item.label; 
+                itemBox.appendChild(label);
+
+                const slot = createSlot(idx, item.answer); 
+                slot.className += ` w-full rounded-2xl py-6 border-2 dashed bg-white/80`;
+                itemBox.appendChild(slot); 
+                list.appendChild(itemBox);
             });
-            wrapper.innerHTML = html;
-            const pool = [...q.options];
-            shuffleArray(pool);
-            const sourceDiv = document.createElement('div');
-            sourceDiv.id = 'q1-source';
-            sourceDiv.className = 'flex flex-wrap justify-center gap-4 bg-white p-4 rounded-xl border-2 border-dashed border-gray-300 min-h-[80px]';
-            pool.forEach((opt, i) => {
-                const el = document.createElement('div');
-                el.id = `q1-word-${i}`;
-                const palette = colorPalettes[Math.floor(Math.random() * colorPalettes.length)];
-                el.className = `drag-item q1-word-item ${palette.bg} ${palette.border} ${palette.text} shadow-sm hover:shadow-md transition-all`;
-                el.draggable = true;
-                el.ondragstart = drag;
-                el.ontouchstart = touchStart;
-                el.ontouchend = touchEnd;
-                el.textContent = opt;
-                el.dataset.value = opt;
-                sourceDiv.appendChild(el);
-            });
-            container.appendChild(sourceDiv);
+
+            wrapper.appendChild(list);
+            renderSourceArea(q.options, wrapper);
         }
 
-        function loadQ2_TableSelection(q) {
-            document.getElementById('question-text').textContent = q.question;
-            const container = document.getElementById('options-container');
-            const table = document.createElement('table');
-            table.className = 'table-check-container';
-            const classificationMap = [{ id: 0, name: "傳統系統平台", colorClass: 'bg-yellow-200', hex: '#fef08a', headerHex: '#fcd34d' }, { id: 1, name: "新興系統平台", colorClass: 'bg-teal-200', hex: '#99f6e4', headerHex: '#5eead4' }];
-            const classificationTypes = [...classificationMap];
-            shuffleArray(classificationTypes); 
-            const thead = table.createTHead();
-            const headerRow = thead.insertRow();
-            const th0 = document.createElement('th');
-            th0.textContent = q.columns[0];
-            headerRow.appendChild(th0);
-            classificationTypes.forEach(type => {
-                const th = document.createElement('th');
-                th.textContent = type.name;
-                th.style.backgroundColor = type.headerHex; 
-                th.style.color = '#1f2937'; 
-                th.dataset.columnId = type.id; 
-                headerRow.appendChild(th);
-            });
-            const tbody = table.createTBody();
-            const rowsData = [...q.platformData];
-            shuffleArray(rowsData); 
-            rowsData.forEach((platform, rowIndex) => {
-                const row = tbody.insertRow();
-                const platformPalette = colorPalettes[rowIndex % colorPalettes.length]; 
-                const initialRowColor = platformPalette.hex;
-                const nameCell = row.insertCell();
-                nameCell.textContent = platform.name;
-                nameCell.style.backgroundColor = initialRowColor; 
-                nameCell.dataset.initialColor = initialRowColor; 
-                classificationTypes.forEach((type) => { 
-                    const cell = row.insertCell();
-                    cell.dataset.classificationId = type.id; 
-                    cell.style.backgroundColor = type.hex; 
-                    cell.dataset.columnColor = type.hex; 
-                    cell.innerHTML = createCheckButton(platform.name, type.id); 
-                });
-            });
-            container.appendChild(table);
-            loadTableSelectionAnswers();
-        }
+        function renderGridSelection(q, wrapper) {
+            const title = document.createElement('h3');
+            title.className = "text-xl md:text-2xl text-gray-700 font-bold mb-8 text-left w-full";
+            title.innerText = q.question;
+            wrapper.appendChild(title);
 
-        // Q3 (Bucket - App)
-        function loadQ3_Bucket(q) {
-            document.getElementById('question-text').textContent = q.question;
-            const container = document.getElementById('options-container');
-            const source = document.createElement('div');
-            source.id = 'q3-source';
-            source.className = 'flex flex-wrap justify-center gap-2 p-4 min-h-[100px] border-b-2 border-gray-100 mb-4';
-            const items = [...q.items];
-            shuffleArray(items);
-            items.forEach((item, i) => {
-                const el = createDragItem(`q3-item-${i}`, item.name, colorPalettes[i%7], true); 
-                el.innerHTML = `<span class="emoji">${item.emoji}</span><span>${item.name}</span>`;
-                el.classList.add('category-item'); 
-                el.dataset.categoryId = item.categoryId;
-                source.appendChild(el);
-            });
-            container.appendChild(source);
-            const grid = document.createElement('div');
-            grid.className = 'grid grid-cols-2 md:grid-cols-4 gap-4';
-            q.categories.forEach(cat => {
-                const bucket = document.createElement('div');
-                bucket.className = `category-target ${cat.color} flex flex-col items-center`;
-                bucket.dataset.categoryId = cat.id;
-                bucket.innerHTML = `<h3 class="font-bold mb-2">${cat.name}</h3><div class="item-container flex flex-wrap justify-center w-full min-h-[100px]" ondragover="allowDrop(event)" ondrop="dropQ3_LIFO(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)"></div>`;
-                grid.appendChild(bucket);
-            });
-            container.appendChild(grid);
-        }
-
-        // Q4 (Unit)
-        function loadQ4_UnitMatching(q) {
-            document.getElementById('question-text').textContent = q.question;
-            const container = document.getElementById('options-container');
-            const source = document.createElement('div');
-            source.id = 'q4-unit-source';
-            source.className = 'flex flex-wrap justify-center gap-3 p-4 min-h-[110px] bg-gray-50 rounded-xl mb-4';
-            const units = [...q.units];
-            shuffleArray(units);
-            units.forEach((unit, i) => {
-                const palette = colorPalettes[i % colorPalettes.length];
-                const el = createDragItem(`q4-unit-item-${i}`, unit.name, palette);
-                el.innerHTML = `<span class="text-xl mr-1">${unit.emoji}</span><span>${unit.name}</span>`;
-                el.dataset.unitId = unit.unitId;
-                el.classList.add('category-item-standard');
-                el.style.width = '140px'; el.style.height = '80px';
-                source.appendChild(el);
-            });
-            container.appendChild(source);
-            const slotsWrapper = document.createElement('div');
-            slotsWrapper.className = 'grid grid-cols-1 md:grid-cols-5 gap-4'; 
-            const descs = [...q.descriptions];
-            shuffleArray(descs);
-            descs.forEach((desc, i) => {
-                const slotContainer = document.createElement('div');
-                slotContainer.className = `flex flex-col items-center p-3 rounded-xl border-2 ${desc.color} shadow-md q3-desc-box`;
-                const text = document.createElement('div');
-                text.className = 'q3-desc-text';
-                text.textContent = desc.text;
-                slotContainer.appendChild(text);
-                const slot = document.createElement('div');
-                slot.className = 'fixed-slot unit-match-slot';
-                slot.dataset.expectedUnitId = desc.unitId;
-                slot.ondragover = allowDrop; slot.ondrop = dropSlotLIFO; slot.ondragenter = dragEnter; slot.ondragleave = dragLeave;
-                // override style for unit block
-                slot.style.width = '140px'; slot.style.height = '80px';
-                slotContainer.appendChild(slot);
-                slotsWrapper.appendChild(slotContainer);
-            });
-            container.appendChild(slotsWrapper);
-        }
-
-        function loadQ5_Slots(q) {
-            document.getElementById('question-text').textContent = q.question;
-            const container = document.getElementById('options-container');
-            const source = document.createElement('div');
-            source.id = 'q5-source';
-            source.className = 'flex flex-wrap justify-center gap-3 p-4 min-h-[110px] bg-gray-50 rounded-xl mb-4';
-            const items = [...q.items];
-            shuffleArray(items);
-            items.forEach((item, i) => {
-                const el = createDragItem(`q5-item-${i}`, item.name, colorPalettes[i%7]);
-                el.innerHTML = `<span class="emoji">${item.emoji}</span><span>${item.name}</span>`;
-                el.classList.add('category-item-standard'); 
-                el.dataset.categoryId = item.categoryId;
-                source.appendChild(el);
-            });
-            container.appendChild(source);
-            const grid = document.createElement('div');
-            grid.className = 'grid grid-cols-1 md:grid-cols-2 gap-6'; 
-            q.categories.forEach(cat => {
-                const section = document.createElement('div');
-                section.className = `p-4 rounded-xl ${cat.color}`;
-                section.innerHTML = `<h3 class="text-xl font-bold text-center mb-4 text-gray-700">${cat.name}</h3>`;
-                const slotsDiv = document.createElement('div');
-                slotsDiv.className = 'slot-container grid grid-cols-2 gap-4 justify-items-center'; 
-                for(let i=0; i<cat.slots; i++) {
-                    const slot = document.createElement('div');
-                    slot.className = 'fixed-slot';
-                    slot.dataset.expectedCat = cat.id;
-                    slot.ondragover = allowDrop; slot.ondrop = dropSlotLIFO; slot.ondragenter = dragEnter; slot.ondragleave = dragLeave;
-                    slotsDiv.appendChild(slot);
-                }
-                section.appendChild(slotsDiv);
-                grid.appendChild(section);
-            });
-            container.appendChild(grid);
-        }
-
-        function loadQ6_Table(q) {
-             const container = document.getElementById('options-container');
-             const randomVar = q.variations[Math.floor(Math.random() * q.variations.length)];
-             const source = document.createElement('div');
-             source.id = 'q6-source';
-             source.className = 'flex flex-wrap justify-center gap-3 p-4 min-h-[110px] bg-gray-50 rounded-xl mb-4 overflow-y-auto max-h-[150px]';
-             q.sourceItems.forEach((item, idx) => {
-                const el = createDragItem(`q6-item-${idx}`, item.name, colorPalettes[idx+2]); 
-                el.innerHTML = `<span class="emoji">${item.emoji}</span><span>${item.name}</span>`;
-                el.classList.add('category-item-standard');
-                el.dataset.typeId = item.id;
-                el.style.width = '100px'; el.style.height = '70px';
-                source.appendChild(el);
-            });
-            container.appendChild(source);
             const tableWrapper = document.createElement('div');
-            tableWrapper.className = 'q5-table-wrapper';
-            const rowDiv = document.createElement('div');
-            rowDiv.className = 'q5-row';
-            const labelTitle = document.createElement('div');
-            labelTitle.className = 'q5-speed-title'; 
-            labelTitle.innerHTML = `${randomVar.labelStart} <div class="font-normal text-sm text-gray-500">${randomVar.labelEnd}</div>`;
-            rowDiv.appendChild(labelTitle);
-            const slotsDiv = document.createElement('div');
-            slotsDiv.className = 'q5-slots flex flex-row flex-nowrap gap-4';
-            randomVar.order.forEach((correctType, sIdx) => {
-                const slot = document.createElement('div');
-                slot.className = 'fixed-slot q5-target-slot';
-                slot.style.width = '100px'; slot.style.height = '70px'; 
-                slot.dataset.correctType = correctType; 
-                slot.ondragover = allowDrop; slot.ondrop = dropSlotLIFO; slot.ondragenter = dragEnter; slot.ondragleave = dragLeave;
-                slotsDiv.appendChild(slot);
-            });
-            rowDiv.appendChild(slotsDiv);
-            tableWrapper.appendChild(rowDiv);
-            container.appendChild(tableWrapper);
-        }
-
-        function loadQ7_GenerationSlots(q) {
-            const container = document.getElementById('options-container');
-            const source = document.createElement('div');
-            source.id = 'q7-source';
-            source.className = 'flex flex-wrap justify-center gap-3 p-4 min-h-[110px] bg-gray-50 rounded-xl mb-4';
-            const items = [...q.items];
-            shuffleArray(items);
-            items.forEach((item, i) => {
-                const el = createDragItem(`q7-item-${i}`, item.name, colorPalettes[i % colorPalettes.length]);
-                el.innerHTML = `<span class="emoji">${item.emoji}</span><span>${item.name}</span>`;
-                el.classList.add('category-item-standard');
-                el.dataset.categoryId = item.categoryId; 
-                el.style.width = '140px'; el.style.height = '60px';
-                source.appendChild(el);
-            });
-            container.appendChild(source);
-            const genContainer = document.createElement('div');
-            genContainer.className = 'gen-table-layout';
-            q.categories.forEach(cat => {
-                 const col = document.createElement('div');
-                 col.className = 'gen-column';
-                 const header = document.createElement('div');
-                 header.className = 'gen-header';
-                 header.textContent = cat.name;
-                 header.style.backgroundColor = cat.color.replace('bg-', 'var(--tw-bg-opacity, 1) '); 
-                 if(cat.color.includes('red')) header.style.backgroundColor = '#ef4444';
-                 if(cat.color.includes('orange')) header.style.backgroundColor = '#f97316';
-                 if(cat.color.includes('yellow')) header.style.backgroundColor = '#eab308';
-                 if(cat.color.includes('green')) header.style.backgroundColor = '#22c55e';
-                 if(cat.color.includes('blue')) header.style.backgroundColor = '#3b82f6';
-                 const body = document.createElement('div');
-                 body.className = 'gen-body';
-                 for(let i=0; i<cat.slots; i++) {
-                    const slot = document.createElement('div');
-                    slot.className = 'fixed-slot gen-target-slot';
-                    slot.dataset.expectedCat = cat.id;
-                    slot.style.width = '140px'; slot.style.height = '60px'; 
-                    slot.ondragover = allowDrop; slot.ondrop = dropSlotLIFO; slot.ondragenter = dragEnter; slot.ondragleave = dragLeave;
-                    body.appendChild(slot);
-                 }
-                 col.appendChild(header); col.appendChild(body);
-                 genContainer.appendChild(col);
-            });
-            container.appendChild(genContainer);
-        }
-
-        function loadQ8_TechMatch(q) {
-             const container = document.getElementById('options-container');
-             const source = document.createElement('div');
-             source.id = 'q8-source';
-             source.className = 'flex flex-wrap justify-center gap-3 p-4 min-h-[110px] bg-gray-50 rounded-xl mb-4';
-             const items = [...q.leftItems];
-             shuffleArray(items);
-             items.forEach((item, i) => {
-                const palette = colorPalettes[i];
-                const el = createDragItem(`q8-item-${i}`, item.name, palette);
-                el.dataset.correctValue = item.value;
-                el.style.width = '150px'; el.style.height = '60px'; el.style.fontSize = '1.8rem'; el.style.fontWeight = 'bold';
-                source.appendChild(el);
-            });
-            container.appendChild(source);
-            const targetsWrapper = document.createElement('div');
-            targetsWrapper.className = 'grid grid-cols-1 md:grid-cols-3 gap-4';
-            const rightItems = [...q.rightItems];
-            shuffleArray(rightItems);
-            rightItems.forEach((target, i) => {
-                 const targetDiv = document.createElement('div');
-                 const palette = colorPalettes[i + 3];
-                 targetDiv.className = `p-4 rounded-xl border-4 border-dashed ${palette.border} ${palette.bg} flex flex-col items-center`;
-                 targetDiv.innerHTML = `<h3 class="font-bold text-lg text-gray-700">${target.name}</h3>`;
-                 const slot = document.createElement('div');
-                 slot.className = 'fixed-slot q8-target-slot mt-2';
-                 slot.style.width = '150px'; slot.style.height = '60px';
-                 slot.dataset.expectedValue = target.correctValue;
-                 slot.ondragover = allowDrop; slot.ondrop = dropSlotLIFO; slot.ondragenter = dragEnter; slot.ondragleave = dragLeave;
-                 targetDiv.appendChild(slot);
-                 targetsWrapper.appendChild(targetDiv);
-            });
-            container.appendChild(targetsWrapper);
-        }
-
-        function checkCurrentAnswer(isLifeline) {
-            const qType = quizData[currentQuestionIndex].type;
-            let errorCount = 0;
+            tableWrapper.className = "w-full max-w-4xl mx-auto bg-white/50 p-6 rounded-[30px] border-2 border-rose-50";
             
-            if (qType === 'drag_and_drop') errorCount = validateQ1(isLifeline);
-            else if (qType === 'table_selection') errorCount = validateQ2(isLifeline);
-            else if (qType === 'category_bucket') errorCount = validateQ3_Bucket(isLifeline); // Bucket Q3
-            else if (qType === 'dnd_units_reverse') errorCount = validateGenericSlots(isLifeline, '.unit-match-slot', 'expectedUnitId', 'unitId');
-            else if (qType === 'category_slots') errorCount = validateGenericSlots(isLifeline, '.fixed-slot', 'expectedCat', 'categoryId');
-            else if (qType === 'table_sort_random') errorCount = validateQ6_Table(isLifeline);
-            else if (qType === 'category_slots_gen') errorCount = validateGenericSlots(isLifeline, '.gen-target-slot', 'expectedCat', 'categoryId');
-            else if (qType === 'drag_and_drop_2col') errorCount = validateGenericSlots(isLifeline, '.q8-target-slot', 'expectedValue', 'correctValue');
+            const headerGrid = document.createElement('div');
+            headerGrid.className = "grid grid-cols-3 gap-4 mb-4 text-center";
+            q.headers.forEach(h => {
+                const hDiv = document.createElement('div');
+                hDiv.className = "font-black text-rose-300 uppercase tracking-widest text-sm";
+                hDiv.innerText = h;
+                headerGrid.appendChild(hDiv);
+            });
+            tableWrapper.appendChild(headerGrid);
 
-            if (!isLifeline) {
-                if (errorCount === 0) {
-                    showMessage("太棒了！完全正確！", "bg-green-500");
-                    questionStatuses[currentQuestionIndex] = 1;
-                    const nextBtn = document.getElementById('next-btn');
-                    nextBtn.classList.add('animate-pulse', 'shadow-xl');
-                    setTimeout(() => nextBtn.classList.remove('animate-pulse', 'shadow-xl'), 1000);
-                } else {
-                    showMessage(`還有 ${errorCount} 個錯誤喔！`, "bg-yellow-500");
-                    questionStatuses[currentQuestionIndex] = 0;
-                }
-            } 
+            q.rows.forEach((row, rowIdx) => {
+                const rowGrid = document.createElement('div');
+                rowGrid.className = "grid grid-cols-3 gap-4 mb-4 items-center";
+
+                const labelDiv = document.createElement('div');
+                labelDiv.className = "bg-white p-4 rounded-2xl shadow-sm font-bold text-gray-500 border border-slate-100 text-center";
+                labelDiv.innerText = row.label;
+                rowGrid.appendChild(labelDiv);
+
+                const displayOptions = row.options.map((text, originalOptIdx) => ({ text, originalOptIdx }))
+                    .sort(() => Math.random() - 0.5);
+
+                displayOptions.forEach((optObj) => {
+                    const optDiv = document.createElement('div');
+                    optDiv.className = "grid-option bg-white p-4 rounded-2xl text-center shadow-sm font-medium text-gray-400 h-full flex items-center justify-center";
+                    optDiv.innerText = optObj.text;
+                    optDiv.dataset.row = rowIdx;
+                    optDiv.dataset.originalOptIdx = optObj.originalOptIdx;
+                    
+                    optDiv.onclick = () => {
+                        rowGrid.querySelectorAll('.grid-option').forEach(el => el.classList.remove('selected'));
+                        optDiv.classList.add('selected');
+                        saveCurrentQuestionState();
+                    };
+                    rowGrid.appendChild(optDiv);
+                });
+                tableWrapper.appendChild(rowGrid);
+            });
+
+            wrapper.appendChild(tableWrapper);
         }
 
-        function useLifeline(id) {
-            if (lifelines > 0) {
-                const btn = document.getElementById(`lifeline-${id}`);
-                if (!btn.classList.contains('used')) {
-                    btn.classList.add('used');
-                    lifelines--;
-                    checkCurrentAnswer(true); 
-                }
-            } else { showMessage("急救包用光了！", "bg-gray-500"); }
+        function renderMultiSelect(q, wrapper) {
+            const title = document.createElement('h3');
+            title.className = "text-xl md:text-2xl text-gray-700 font-bold mb-10 text-left w-full";
+            title.innerText = q.question;
+            wrapper.appendChild(title);
+
+            const grid = document.createElement('div');
+            grid.className = "grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl mx-auto";
+
+            const shuffled = [...q.options].sort(() => Math.random() - 0.5);
+            const colorIndexes = Array.from({length: 7}, (_, i) => i).sort(() => Math.random() - 0.5);
+
+            shuffled.forEach((opt, idx) => {
+                const btn = document.createElement('div');
+                const colorIdx = colorIndexes[idx % 7];
+                btn.className = `select-option color-${colorIdx} p-8 rounded-3xl shadow-sm text-center text-xl font-bold text-gray-700`;
+                btn.innerText = opt.text;
+                btn.dataset.text = opt.text;
+                
+                btn.onclick = () => {
+                    btn.classList.toggle('selected');
+                    saveCurrentQuestionState();
+                };
+                grid.appendChild(btn);
+            });
+
+            wrapper.appendChild(grid);
         }
-        function updateLifelineUI() {
-            for(let i=1; i<=3; i++) {
-                const btn = document.getElementById(`lifeline-${i}`);
-                if (btn) {
-                    if (i > lifelines) { if(!btn.classList.contains('used')) btn.classList.add('used'); } else { btn.classList.remove('used'); }
-                }
+
+        function createSlot(index, answer) {
+            const slot = document.createElement('div');
+            slot.className = `slot`;
+            slot.dataset.type = "slot"; 
+            slot.dataset.index = index; 
+            slot.dataset.answer = answer;
+            slot.ondragover = (e) => { e.preventDefault(); slot.classList.add('drag-over'); };
+            slot.ondragleave = () => slot.classList.remove('drag-over');
+            slot.ondrop = (e) => handleDrop(e, slot);
+            return slot;
+        }
+
+        function renderSourceArea(options, wrapper) {
+            const sourceArea = document.createElement('div');
+            sourceArea.className = "mt-12 p-8 bg-rose-50/20 rounded-[40px] border-2 border-dashed border-rose-100 flex flex-wrap justify-center gap-5 min-h-[140px] w-full";
+            sourceArea.id = "source-area"; sourceArea.dataset.type = "source";
+            sourceArea.ondragover = (e) => e.preventDefault();
+            sourceArea.ondrop = (e) => handleDrop(e, sourceArea);
+            
+            const shuffled = [...options].sort(() => Math.random() - 0.5);
+            shuffled.forEach((opt, idx) => {
+                sourceArea.appendChild(createDragElement(opt, idx, idx % 7));
+            });
+            wrapper.appendChild(sourceArea);
+        }
+
+        function createDragElement(text, idSuffix, colorIdx) {
+            const el = document.createElement('div');
+            el.className = `macaron-btn color-${colorIdx} px-8 py-3 rounded-2xl shadow-sm font-bold text-gray-700 text-lg whitespace-nowrap`;
+            el.innerText = text; 
+            el.id = `opt-${currentIdx}-${idSuffix}-${Math.random().toString(36).substr(2, 5)}`;
+            el.draggable = true; 
+            el.dataset.value = text;
+            el.ondragstart = (e) => { e.dataTransfer.setData("text/plain", el.id); e.target.style.opacity = "0.4"; };
+            el.ondragend = (e) => { e.target.style.opacity = "1"; };
+            return el;
+        }
+
+        function handleDrop(e, target) {
+            e.preventDefault();
+            const elId = e.dataTransfer.getData("text/plain");
+            const el = document.getElementById(elId);
+            if (!el) return;
+            
+            if (target.dataset.type === "slot") {
+                const existing = target.querySelector('.macaron-btn');
+                if (existing) document.getElementById('source-area').appendChild(existing);
+                target.appendChild(el);
+            } else if (target.dataset.type === "source") {
+                target.appendChild(el);
             }
+            saveCurrentQuestionState();
         }
-        function showResults() {
-            let finalScore = 0;
-            quizData.forEach((q, index) => { if (questionStatuses[index] === 1) finalScore++; });
-            const total = quizData.length;
-            const endTime = Date.now();
-            const durationSeconds = Math.floor((endTime - quizStartTime) / 1000);
-            const minutes = Math.floor(durationSeconds / 60);
-            const seconds = durationSeconds % 60;
-            const timeString = `${minutes}分 ${seconds}秒`;
-            document.getElementById('question-display').classList.add('hidden');
-            document.getElementById('result-display').classList.remove('hidden');
-            document.getElementById('attempt-count').textContent = attemptCount;
-            document.getElementById('time-taken').textContent = timeString;
-            document.getElementById('final-score-number').textContent = finalScore;
-            document.getElementById('final-score-text').textContent = `滿分是 ${total} 題`;
-            let message = "";
-            if(finalScore === total) message = "太神啦！完美滿分！🏆";
-            else if(finalScore >= total*0.6) message = "很棒喔！繼續保持！🌟";
-            else message = "再加油！📚";
-            document.getElementById('final-message').textContent = message;
-        }
-        function restartQuiz() { document.getElementById('result-display').classList.add('hidden'); startQuiz(); }
-        
+
         function saveCurrentQuestionState() {
-            const container = document.getElementById('options-container');
-            const q1container = document.querySelector('.q1-slot');
-            if (!container && !q1container) return;
-            const state = {};
-            const qType = quizData[currentQuestionIndex].type;
-            if (qType === 'table_selection') {
-                const checks = container.querySelectorAll('.check-box.checked');
-                checks.forEach(chk => { state[chk.id] = true; });
+            const q = quizData[currentIdx];
+            const state = { values: {} };
+            
+            if (q.type === 'grid_selection') {
+                document.querySelectorAll('.grid-option.selected').forEach(el => {
+                    state.values[el.dataset.row] = parseInt(el.dataset.originalOptIdx);
+                });
+            } else if (q.type === 'multi_select') {
+                const selected = [];
+                document.querySelectorAll('.select-option.selected').forEach(el => selected.push(el.dataset.text));
+                state.values = selected;
             } else {
-                const items = document.querySelectorAll('.drag-item, .category-item, .category-item-standard, .unit-match-item, .q1-word-item');
-                items.forEach(item => { if (item.parentElement) { state[item.id] = item.parentElement.id; } });
+                document.querySelectorAll('.slot').forEach(slot => {
+                    const item = slot.querySelector('.macaron-btn');
+                    if (item) state.values[slot.dataset.index] = { elId: item.id, val: item.dataset.value };
+                });
             }
-            quizState[currentQuestionIndex] = state;
+            userStates[currentIdx] = state;
         }
 
         function restoreCurrentQuestionState() {
-            const state = quizState[currentQuestionIndex];
+            const state = userStates[currentIdx];
             if (!state) return;
-            const qType = quizData[currentQuestionIndex].type;
-            if (qType === 'table_selection') {
-                for (const id in state) {
-                    const el = document.getElementById(id);
-                    if (el) { el.classList.add('checked'); el.querySelector('.check-mark').classList.remove('opacity-0'); }
-                }
+            const q = quizData[currentIdx];
+
+            if (q.type === 'grid_selection') {
+                Object.keys(state.values).forEach(rowIdx => {
+                    const origIdx = state.values[rowIdx];
+                    const el = document.querySelector(`.grid-option[data-row="${rowIdx}"][data-original-opt-idx="${origIdx}"]`);
+                    if (el) el.classList.add('selected');
+                });
+            } else if (q.type === 'multi_select') {
+                state.values.forEach(val => {
+                    const el = document.querySelector(`.select-option[data-text="${val}"]`);
+                    if (el) el.classList.add('selected');
+                });
             } else {
-                for (const itemId in state) {
-                    const parentId = state[itemId];
-                    const item = document.getElementById(itemId);
-                    const parent = document.getElementById(parentId);
-                    if (item && parent) {
-                        if (qType === 'category_bucket' || qType === 'category_slots' || qType === 'dnd_units_reverse') {
-                             if(parent.id.includes('source')) {
-                                item.style.margin = '4px';
-                                if(qType === 'category_bucket') item.style.width = '110px';
-                                if(qType === 'category_slots') { item.style.margin = ''; item.style.width = ''; }
-                             } else {
-                                item.style.margin = '0';
-                                item.style.width = '100%';
-                                if(qType === 'category_bucket') item.style.width = 'auto'; 
-                                if(qType === 'dnd_units_reverse') item.style.height = '100%'; 
-                             }
-                        }
-                        item.classList.remove('dragging');
-                        parent.appendChild(item);
-                        if (parent.classList.contains('q1-slot') || parent.classList.contains('fixed-slot')) { parent.classList.add('filled'); }
+                Object.keys(state.values).forEach(slotIdx => {
+                    const elId = state.values[slotIdx].elId;
+                    const el = document.getElementById(elId);
+                    const slot = document.querySelector(`.slot[data-index="${slotIdx}"]`);
+                    if (el && slot) slot.appendChild(el);
+                });
+            }
+        }
+
+        function navigate(dir) {
+            saveCurrentQuestionState();
+            if (dir > 0) {
+                if (!quizCheckedStatus[currentIdx]) {
+                    showCustomModal("提醒", "您尚未檢查答案，確定要直接進入下一題嗎？", "好的", () => {
+                        performNavigation(dir);
+                    });
+                    return;
+                }
+            }
+            performNavigation(dir);
+        }
+
+        function performNavigation(dir) {
+            if (currentIdx + dir >= quizData.length) { showFinalSummary(); return; }
+            currentIdx += dir; renderQuestion();
+        }
+
+        function checkAnswer() {
+            quizCheckedStatus[currentIdx] = true;
+            totalAttempts++;
+            const q = quizData[currentIdx];
+            let errors = 0; let incomplete = false;
+            
+            if (q.type === 'grid_selection') {
+                q.rows.forEach((row, rowIdx) => {
+                    const selected = document.querySelector(`.grid-option.selected[data-row="${rowIdx}"]`);
+                    if (!selected) incomplete = true;
+                    else if (parseInt(selected.dataset.originalOptIdx) !== row.answer) errors++;
+                });
+            } else if (q.type === 'multi_select') {
+                const selected = Array.from(document.querySelectorAll('.select-option.selected')).map(el => el.dataset.text);
+                if (selected.length === 0) incomplete = true;
+                
+                q.options.forEach(opt => {
+                    const isSelected = selected.includes(opt.text);
+                    if (opt.correct && !isSelected) errors++;
+                    if (!opt.correct && isSelected) errors++;
+                });
+            } else {
+                document.querySelectorAll('.slot').forEach(slot => {
+                    const item = slot.querySelector('.macaron-btn');
+                    if (!item) incomplete = true;
+                    if (item && item.dataset.value !== slot.dataset.answer) {
+                        errors++;
+                        slot.classList.add('border-red-400');
+                        slot.classList.remove('border-emerald-400');
+                    } else if (item) {
+                        slot.classList.add('border-emerald-400');
+                        slot.classList.remove('border-red-400');
                     }
-                }
+                });
             }
-        }
-        
-        function updateNavigationButtons() {
-            const prevBtn = document.getElementById('prev-btn');
-            const nextBtn = document.getElementById('next-btn');
-            prevBtn.disabled = currentQuestionIndex === 0;
-            if (currentQuestionIndex === quizData.length - 1) {
-                nextBtn.textContent = '完成測驗 (總結)';
-                nextBtn.classList.remove('bg-purple-500', 'hover:bg-purple-600');
-                nextBtn.classList.add('bg-green-500', 'hover:bg-green-600');
+
+            if (incomplete) { showToast("請完成所有選項喔！", "error"); return; }
+            if (errors === 0) {
+                showToast("✨ 太強了！全部正確！", "success");
+                quizPassedStatus[currentIdx] = true;
+                updateProgressIndicators();
             } else {
-                nextBtn.textContent = '下一題';
-                nextBtn.classList.remove('bg-green-500', 'hover:bg-green-600');
-                nextBtn.classList.add('bg-purple-500', 'hover:bg-purple-600');
+                showToast(`有 ${errors} 個錯誤，再細心檢查看看！`, "error");
             }
         }
 
-        function prevQuestion() { saveCurrentQuestionState(); if (currentQuestionIndex > 0) { currentQuestionIndex--; loadQuestion(); } }
-        function nextQuestion() { saveCurrentQuestionState(); if (currentQuestionIndex < quizData.length - 1) { currentQuestionIndex++; loadQuestion(); } else { showResults(); } }
-        function startQuiz() { currentQuestionIndex = 0; score = 0; questionStatuses = Array(quizData.length).fill(null); quizState = {}; attemptCount++; lifelines = 3; quizStartTime = Date.now(); document.getElementById('start-screen').classList.add('hidden'); document.getElementById('question-display').classList.remove('hidden'); loadQuestion(); }
-        
-        function loadQuestion() {
-            const currentQuestion = quizData[currentQuestionIndex];
-            document.getElementById('question-number').textContent = `#${currentQuestionIndex + 1}`;
-            const optionsContainer = document.getElementById('options-container');
-            optionsContainer.innerHTML = '';
-            if (currentQuestion.type === 'drag_and_drop') loadQ1_FillBlanks(currentQuestion);
-            else if (currentQuestion.type === 'table_selection') loadQ2_TableSelection(currentQuestion);
-            else if (currentQuestion.type === 'category_bucket') loadQ3_Bucket(currentQuestion); 
-            else if (currentQuestion.type === 'dnd_units_reverse') loadQ4_UnitMatching(currentQuestion); 
-            else if (currentQuestion.type === 'category_slots') loadQ5_Slots(currentQuestion); 
-            else if (currentQuestion.type === 'table_sort_random') loadQ6_Table(currentQuestion); 
-            else if (currentQuestion.type === 'category_slots_gen') loadQ7_GenerationSlots(currentQuestion); 
-            else if (currentQuestion.type === 'drag_and_drop_2col') loadQ8_TechMatch(currentQuestion); 
-            setTimeout(restoreCurrentQuestionState, 0);
-            updateNavigationButtons();
-            updateLifelineUI();
-        }
-        
-        function validateQ3_Bucket(isLifeline) {
-             let errorCount = 0;
-             const items = document.querySelectorAll('#q3-source ~ .grid .category-item'); 
-             items.forEach(item => {
-                const bucket = item.closest('.category-target');
-                if(isLifeline) item.style.borderColor = item.dataset.initialBorderColor || '';
-                if (!bucket || bucket.dataset.categoryId !== item.dataset.categoryId) {
-                    errorCount++;
-                    if(isLifeline) item.style.borderColor = 'red';
-                } else if (isLifeline) { item.style.borderColor = '#22c55e'; }
-             });
-             if (document.getElementById('q3-source').children.length > 0) errorCount += document.getElementById('q3-source').children.length;
-             return errorCount;
+        function updateProgressIndicators() {
+            document.querySelectorAll('.progress-circle').forEach(circle => {
+                if (quizPassedStatus[parseInt(circle.dataset.idx)]) circle.classList.add('passed');
+            });
         }
 
+        function showToast(msg, type) {
+            const toast = document.getElementById('toast');
+            if (toast) {
+                toast.innerText = msg;
+                toast.style.backgroundColor = type === 'success' ? '#10b981' : '#334155';
+                toast.style.opacity = "1";
+                setTimeout(() => toast.style.opacity = "0", 2500);
+            }
+        }
+
+        function showFinalSummary() {
+            if (timerInterval) clearInterval(timerInterval);
+            const timerText = document.getElementById('timer').innerText;
+            let correctCount = 0; 
+            quizData.forEach((_, idx) => { if (quizPassedStatus[idx]) correctCount++; });
+            
+            const randomQuote = inspirationalQuotes[Math.floor(Math.random() * inspirationalQuotes.length)];
+            document.getElementById('quote-zh').innerText = randomQuote.zh;
+            document.getElementById('quote-en').innerText = randomQuote.en;
+            
+            const stats = document.getElementById('final-stats');
+            stats.innerHTML = `
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="bg-rose-50 p-8 rounded-[30px] text-center border border-rose-100 shadow-sm flex flex-col justify-center">
+                        <p class="text-gray-400 font-bold mb-2 uppercase text-xs tracking-widest">測驗結果</p>
+                        <p class="text-3xl font-black text-rose-400">答對題數：${correctCount} / 總題數：${quizData.length}</p>
+                    </div>
+                    <div class="bg-emerald-50 p-8 rounded-[30px] text-center border border-emerald-100 shadow-sm">
+                        <p class="text-gray-400 font-bold mb-2 uppercase text-xs tracking-widest">總用時</p>
+                        <p class="text-5xl font-black text-emerald-400">${timerText}</p>
+                    </div>
+                </div>
+                <div class="text-center p-6 bg-slate-50 rounded-2xl">
+                    <p class="text-lg text-slate-500 font-medium">
+                        挑戰序號：<span class="text-rose-400 font-bold">#${quizAttemptCount}</span> | 
+                        檢查次數：<span class="text-rose-400 font-bold">${totalAttempts}</span>
+                    </p>
+                </div>`;
+            document.getElementById('result-overlay').classList.remove('hidden');
+        }
+
+        function restartQuiz() {
+            document.getElementById('result-overlay').classList.add('hidden');
+            userStates = {}; quizCheckedStatus = {}; quizPassedStatus = {};
+            quizAttemptCount++; totalAttempts = 0; isTimerStarted = false;
+            currentIdx = 0;
+            renderQuestion();
+            startTimer();
+        }
     </script>
 </body>
 </html>
