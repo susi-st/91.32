@@ -34,39 +34,47 @@
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             cursor: pointer;
             border: 2px solid rgba(255, 255, 255, 0.5);
+            padding-top: 0.75rem;
+            padding-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: 3.5rem;
         }
 
-        .macaron-btn:active {
-            transform: scale(0.95);
-        }
+        .macaron-btn:active { transform: scale(0.95); }
 
         .slot {
             transition: all 0.3s ease;
-            min-height: 3.2rem;
+            min-height: 3.5rem;
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            text-align: center;
             vertical-align: middle;
             background: #f8fafc;
             border: 2px dashed #e2e8f0;
             font-weight: bold;
             position: relative;
             margin: 0 0.4rem;
-            border-radius: 12px;
+            border-radius: 15px;
             padding: 4px;
         }
 
-        .slot.drag-over {
-            background: rgba(244, 114, 182, 0.08);
-            border-color: #f472b6;
-        }
+        .slot.drag-over { background: rgba(244, 114, 182, 0.08); border-color: #f472b6; }
 
-        /* 勾選/多選題專用樣式 */
         .grid-option, .select-option {
             cursor: pointer;
             transition: all 0.3s ease;
             border: 2px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: 4rem;
         }
+        
         .grid-option.selected, .select-option.selected {
             background-color: var(--macaron-pink) !important;
             border-color: #fb7185;
@@ -77,10 +85,7 @@
         }
 
         .fade-in { animation: fadeIn 0.5s ease-out forwards; }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
         .progress-circle {
             width: 34px;
@@ -95,15 +100,16 @@
             background-color: white;
             border: 2px solid #f1f5f9;
             color: #cbd5e1;
+            cursor: pointer;
         }
+        
         .progress-circle.passed {
-            background-color: #f472b6;
-            border-color: #f472b6;
+            background-color: #4ade80; 
+            border-color: #4ade80;
             color: white;
-            box-shadow: 0 4px 10px rgba(244, 114, 182, 0.2);
+            box-shadow: 0 4px 10px rgba(74, 222, 128, 0.3);
         }
 
-        /* 顏色類別 */
         .color-0 { background-color: var(--macaron-pink); }
         .color-1 { background-color: var(--macaron-orange); }
         .color-2 { background-color: var(--macaron-yellow); }
@@ -111,80 +117,74 @@
         .color-4 { background-color: var(--macaron-blue); }
         .color-5 { background-color: var(--macaron-purple); }
         .color-6 { background-color: var(--macaron-mint); }
+        
+        .custom-checkbox { width: 18px; height: 18px; cursor: pointer; accent-color: #f472b6; }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen p-4">
 
     <div id="quiz-app" class="main-card bg-white w-full flex flex-col relative overflow-hidden">
         
-        <!-- 上方標題列 -->
         <header class="px-8 md:px-12 pt-8 pb-5 flex flex-wrap gap-4 justify-between items-center bg-rose-50/30">
             <div class="flex flex-col">
                 <div class="flex items-center flex-wrap gap-4">
-                    <h1 class="text-2xl md:text-3xl font-black text-rose-400">✨ 新興系統平台</h1>
-                    <div id="status-indicators" class="flex gap-2 ml-2">
-                        <!-- JS 生成進度點 -->
-                    </div>
+                    <h1 class="text-2xl md:text-3xl font-black text-rose-400">✨ 新興系統平台課後總複習</h1>
+                    <div id="status-indicators" class="flex gap-2 ml-2"></div>
                 </div>
                 <p class="text-gray-400 text-sm mt-1">作答進度: <span id="progress-text" class="font-bold text-rose-300"></span></p>
             </div>
             
-            <div id="timer" class="text-xl font-bold text-gray-500 bg-white px-5 py-2 rounded-full shadow-sm border border-rose-100">00:00</div>
+            <div id="timer-container" class="flex items-center gap-2 bg-white px-5 py-2 rounded-full shadow-sm border border-rose-100">
+                <span class="text-xl">⏱️</span>
+                <div id="timer" class="text-xl font-bold text-gray-500">00:00</div>
+            </div>
         </header>
 
-        <!-- 主內容區 -->
-        <main id="question-container" class="flex-grow px-8 md:px-16 py-8 md:py-10 overflow-y-auto">
-            <!-- 題目由 JS 注入 -->
-        </main>
+        <main id="question-container" class="flex-grow px-8 md:px-16 py-8 md:py-10 overflow-y-auto"></main>
 
-        <!-- 下方導覽列 -->
         <footer class="p-6 md:p-8 bg-slate-50/50 flex flex-wrap gap-4 justify-between items-center z-[200]">
-            <button id="prev-btn" class="px-8 py-3 rounded-full border-2 border-rose-100 text-rose-300 font-bold hover:bg-rose-50 disabled:opacity-20 transition-all">
-                上一題
-            </button>
-            
+            <button id="prev-btn" class="px-8 py-3 rounded-full border-2 border-rose-100 text-rose-300 font-bold hover:bg-rose-50 disabled:opacity-20 transition-all">上一題</button>
             <div class="flex items-center gap-4">
-                <button id="check-btn" class="px-10 py-4 bg-rose-400 text-white rounded-full font-black shadow-lg shadow-rose-100 hover:bg-rose-500 transition-all active:scale-95">
-                    檢查答案
-                </button>
-                <button id="next-btn" class="px-10 py-3 rounded-full bg-indigo-400 text-white font-bold hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-100 disabled:bg-gray-300">
-                    下一題
-                </button>
+                <button id="check-btn" class="px-10 py-4 bg-rose-400 text-white rounded-full font-black shadow-lg shadow-rose-100 hover:bg-rose-500 transition-all active:scale-95">檢查答案</button>
+                <button id="next-btn" class="px-10 py-3 rounded-full bg-indigo-400 text-white font-bold hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-100">下一題</button>
             </div>
         </footer>
 
-        <!-- 彈窗 -->
         <div id="modal-overlay" class="fixed inset-0 bg-black/40 z-[300] flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
             <div class="bg-white rounded-[40px] p-10 max-w-sm w-full shadow-2xl transform scale-90 transition-transform duration-300" id="modal-content">
                 <div class="text-5xl mb-6 text-center">💡</div>
                 <h3 id="modal-title" class="text-2xl font-black text-gray-800 text-center mb-3">溫馨提醒</h3>
                 <p id="modal-message" class="text-gray-500 text-center mb-8 leading-relaxed"></p>
+                
+                <div id="check-remind-container" class="flex items-center justify-center gap-2 mb-8 select-none">
+                    <input type="checkbox" id="dont-ask-again" class="custom-checkbox">
+                    <label for="dont-ask-again" class="text-sm font-bold text-slate-400 cursor-pointer">記住我的回答</label>
+                </div>
+
                 <div class="flex gap-4 justify-center">
-                    <button onclick="closeModal()" class="px-8 py-2 border-2 border-gray-100 text-gray-400 font-bold rounded-full hover:bg-gray-50 transition-all">返回</button>
+                    <button id="modal-cancel-btn" onclick="closeModal()" class="px-8 py-2 border-2 border-gray-100 text-gray-400 font-bold rounded-full hover:bg-gray-50 transition-all">返回</button>
                     <button id="modal-confirm-btn" class="px-8 py-2 bg-indigo-400 text-white font-bold rounded-full shadow-lg hover:bg-indigo-500 transition-all active:scale-95">確認</button>
                 </div>
             </div>
         </div>
 
-        <!-- 結算頁面 -->
         <div id="result-overlay" class="absolute inset-0 bg-white z-[500] flex flex-col items-center justify-center p-6 hidden fade-in overflow-y-auto">
-            <div class="border-4 border-rose-100 rounded-[50px] p-10 max-w-2xl w-full bg-white shadow-2xl my-8">
-                <h2 class="text-4xl font-black text-rose-400 mb-8 text-center">🏆 測驗完成！</h2>
-                <div id="final-stats" class="space-y-6 mb-10"></div>
+            <div class="border-4 border-rose-100 rounded-[50px] p-10 max-w-3xl w-full bg-white shadow-2xl my-8 text-center">
+                <h2 class="text-4xl font-black text-rose-400 mb-4">🏆 測驗完成！</h2>
+                <div id="final-comment" class="bg-rose-50/50 text-rose-500 p-6 rounded-3xl font-bold text-lg mb-8 border border-rose-100"></div>
+                
+                <div id="final-stats" class="space-y-4 mb-10"></div>
+                
                 <div class="bg-indigo-50 p-8 rounded-[30px] mb-10 text-center border border-indigo-100">
                     <div id="quote-zh" class="text-xl font-bold text-indigo-500 mb-4"></div>
                     <div id="quote-en" class="text-sm italic text-indigo-300 leading-relaxed"></div>
                 </div>
-                <div class="flex justify-center">
-                    <button onclick="restartQuiz()" class="px-16 py-5 bg-rose-400 text-white rounded-full text-2xl font-black shadow-2xl hover:bg-rose-500 transition-all active:scale-95">
-                        重新挑戰
-                    </button>
-                </div>
+                <div class="flex justify-center"><button onclick="restartQuiz()" class="px-16 py-5 bg-rose-400 text-white rounded-full text-2xl font-black shadow-2xl hover:bg-rose-500 transition-all active:scale-95">重新挑戰</button></div>
             </div>
         </div>
     </div>
 
-    <div id="toast" class="fixed bottom-12 left-1/2 -translate-x-1/2 px-10 py-5 rounded-full bg-slate-800 text-white font-bold opacity-0 transition-opacity pointer-events-none z-[600] text-xl shadow-2xl"></div>
+    <div id="toast" class="fixed bottom-12 left-1/2 -translate-x-1/2 px-10 py-5 rounded-full bg-slate-800 text-white font-bold opacity-0 transition-opacity pointer-events-none z-[600] text-xl shadow-lg"></div>
 
     <script>
         const quizData = [
@@ -197,62 +197,110 @@
             {
                 type: 'matching_list',
                 question: "請根據下方功能敘述，將正確的硬體平台拖入對應區塊：",
-                options: ["智慧型手錶", "智慧型眼鏡"],
+                options: ["智慧型手錶 ⌚", "智慧型眼鏡 👓"],
                 items: [
-                    { label: "可以隨時量測個人的步行數量、心率及運動狀態", answer: "智慧型手錶" },
-                    { label: "可以進行識物學習、判斷和動作預測", answer: "智慧型眼鏡" }
+                    { label: "可隨時量測步數、心率及運動狀態", answer: "智慧型手錶 ⌚" },
+                    { label: "可進行識物學習、判斷和動作預測", answer: "智慧型眼鏡 👓" }
                 ]
             },
             {
                 type: 'matching_list',
-                question: "請將下列雲端服務模型正確分類：",
-                options: ["基礎設施即服務(Iaas)", "平臺即服務(Paas)", "軟體即服務(SaaS)"],
+                question: "請根據雲端服務平台的「描述」與所指的「服務分類」配對：",
+                options: ["基礎設施即服務(IaaS)", "平臺即服務(PaaS)", "軟體即服務(SaaS)"],
                 items: [
-                    { label: "由硬體及網路設備形成的雲端虛擬主機", answer: "基礎設施即服務(Iaas)" },
-                    { label: "提供網站開發環境與工具", answer: "平臺即服務(Paas)" },
+                    { label: "由硬體及網路設備形成的雲端虛擬主機", answer: "基礎設施即服務(IaaS)" },
+                    { label: "提供網站開發環境與工具", answer: "平臺即服務(PaaS)" },
                     { label: "提供各項網頁服務，如電子郵件", answer: "軟體即服務(SaaS)" }
                 ]
             },
             {
                 type: 'matching_list',
-                question: "請針對雲端服務的不同受益對象，進行正確的特色配對：",
+                question: "請根據雲端服務平台的「描述」與所服務的「對象」進行配對：",
                 options: ["一般使用者", "軟體、系統開發者", "企業或公司"],
                 items: [
-                    { label: "不必安裝軟體，只要連上網就能使用", answer: "一般使用者" },
+                    { label: "不必安裝軟體，只要連上網就能使用的服務", answer: "一般使用者" },
                     { label: "不用管理網站或主機，直接租用應用程式介面", answer: "軟體、系統開發者" },
-                    { label: "省下買主機、網路設備、授權的開銷", answer: "企業或公司" }
+                    { label: "可省下購買主機、網路設備、授權與後續維護", answer: "企業或公司" }
                 ]
             },
             {
+                type: 'matching_list',
+                question: "請根據描述的對象點選正確的雲端服務模式：",
+                options: ["基礎設施即服務(IaaS)", "平臺即服務(PaaS)", "軟體即服務(SaaS)"],
+                items: [
+                    { label: "🏢 公司/企業", answer: "基礎設施即服務(IaaS)" },
+                    { label: "💻 軟體(系統)開發人員", answer: "平臺即服務(PaaS)" },
+                    { label: "👤 一般使用者", answer: "軟體即服務(SaaS)" }
+                ],
+                isParallel: true 
+            },
+            {
                 type: 'grid_selection',
-                question: "嵌入式系統平台的特色何者為是？",
-                headers: ["特性項目", "選項 A", "選項 B"],
+                question: "請針對嵌入式系統平台的各種特性點選正確的選項",
                 rows: [
-                    { label: "執行的工作", options: ["預先設定", "未經設定"], answer: 0 },
-                    { label: "控制/運算單元", options: ["簡易", "複雜"], answer: 0 },
-                    { label: "運作電力", options: ["節能", "耗能"], answer: 0 }
+                    { label: "執行的工作任務，是：", options: ["預先設定", "未經設定"], answer: 0 },
+                    { label: "控制/運算單元，是：", options: ["簡易的", "複雜的"], answer: 0 },
+                    { label: "在電能的使用上，是：", options: ["節能", "耗能"], answer: 0 }
                 ]
             },
             {
                 type: 'multi_select',
-                question: "請點擊屬於「嵌入式系統平臺」的設備",
+                question: "請點選生活中含有「嵌入式系統平台」的設備(共四種)",
                 options: [
-                    { text: "掃地機器人", correct: true },
-                    { text: "洗衣機", correct: true },
-                    { text: "冷氣機", correct: true },
-                    { text: "YouBike 2.0", correct: true },
-                    { text: "筆記型電腦", correct: false },
-                    { text: "平板", correct: false },
-                    { text: "Gmail", correct: false },
-                    { text: "電動公車", correct: false }
+                    { text: "🤖 掃地機器人", correct: true, colorIdx: 4 },
+                    { text: "🧺 洗衣機", correct: true, colorIdx: 6 },
+                    { text: "❄️ 冷氣機", correct: true, colorIdx: 3 },
+                    { text: "🚲 YouBike 2.0", correct: true, colorIdx: 1 },
+                    { text: "💻 筆記型電腦", correct: false, colorIdx: 5 },
+                    { text: "📱 平板", correct: false, colorIdx: 2 },
+                    { text: "📧 Gmail", correct: false, colorIdx: 4 },
+                    { text: "🚌 電動公車", correct: false, colorIdx: 6 }
                 ]
             }
         ];
 
+        const scoreComments = [
+            "別灰心，這只是起點！重新複習一下吧！加油！", 
+            "踏出了成功的第一步！再接再厲！", 
+            "有不錯的基礎喔！只要再專注一點！", 
+            "表現平穩！你已經掌握了一些重點！",
+            "表現越來越好了！朝向滿分前進吧！", 
+            "做得好！你的概念相當清晰了！", 
+            "非常優秀！只差一點點就完美了！", 
+            "太精采了！滿分全對！科技達人！"
+        ];
+        
         const inspirationalQuotes = [
             { en: "Stay hungry, stay foolish.", zh: "求知若渴，虛心若愚。 — 賈伯斯" },
             { en: "Action is the foundational key to all success.", zh: "行動是所有成功的基石。 — 畢卡索" },
-            { en: "Believe you can and you're halfway there.", zh: "相信你自己能做到，你就已經成功了一半。 — 羅斯福" }
+            { en: "Believe you can and you're halfway there.", zh: "相信你自己能做到，你就已經成功了一半。 — 羅斯福" },
+            { en: "Success is not final, failure is not fatal.", zh: "成功不是終點，失敗也不是終結：勇氣才是最重要的。 — 邱吉爾" },
+            { en: "Genius is 1% inspiration and 99% perspiration.", zh: "天才是1%的靈感加上99%的汗水。 — 愛迪生" },
+            { en: "The best way to predict the future is to create it.", zh: "預測未來最好的方法就是去創造它。 — 彼得·杜拉克" },
+            { en: "Don't let yesterday take up too much of today.", zh: "不要讓昨天佔據了今天太多的時間。" },
+            { en: "Every day is a new beginning.", zh: "每一天都是一個全新的開始。" },
+            { en: "Failure is the mother of success.", zh: "失敗是成功之母。 — 諺語" },
+            { en: "Your effort will be seen by time.", zh: "你的努力，時間終會看見。" },
+            { en: "Dare to dream, dare to act.", zh: "勇敢做夢，大膽實踐。" },
+            { en: "Learning is not the filling of a pail, but the lighting of a fire.", zh: "學習不是填充，而是點燃火焰。 — 葉慈" },
+            { en: "It doesn't matter how slowly you go as long as you do not stop.", zh: "慢一點沒關係，只要你不停下腳步。 — 孔子" },
+            { en: "Be the change you want to see in the world.", zh: "欲變世界，先變自身。 — 甘地" },
+            { en: "You are unique and capable of great things.", zh: "你是獨一無二的，且有能力成就偉大。" },
+            { en: "The process is more important than the result.", zh: "過程往往比結果更為重要。" },
+            { en: "Every attempt is a step toward growth.", zh: "每一次的嘗試，都是通往成長的階梯。" },
+            { en: "Stay curious, it's the source of wisdom.", zh: "保持好奇心，它是智慧的源泉。" },
+            { en: "Dream big and keep going.", zh: "夢想因堅持而美麗，因行動而真實。" },
+            { en: "Smile is the best weapon against difficulties.", zh: "微笑是面對困難最好的武器。" },
+            { en: "Books take you to places you've never been.", zh: "閱讀能帶領你去往未曾抵達的地方。" },
+            { en: "Kindness is a choice and a power.", zh: "善良是一種選擇，更是一種強大的力量。" },
+            { en: "Today's sweat is tomorrow's fruit.", zh: "今日辛勤的汗水，將成就明日甜美的果實。" },
+            { en: "Don't fear the long road, fear the short heart.", zh: "不怕路長，只怕心短。" },
+            { en: "Go where your heart leads.", zh: "心之所向，素履以往。" },
+            { en: "Life is bright and all things are lovely.", zh: "生活明朗，萬物可愛。" },
+            { en: "Love what you love.", zh: "熱愛你的熱愛，奔赴你的山海。" },
+            { en: "Ordinary steps can finish a great journey.", zh: "平凡的腳步也能走完偉大的行程。" },
+            { en: "Eyes full of light, heart full of love.", zh: "願你眼裡有光，心中有愛。" },
+            { en: "Chase the wind, find your horizon.", zh: "追風的人，終會抵達理想的彼岸。" }
         ];
 
         let currentIdx = 0;
@@ -264,17 +312,19 @@
         let startTime = Date.now();
         let timerInterval = null;
         let isTimerStarted = false; 
+        let skipAlertPermanently = false; 
 
-        window.onload = () => {
-            initIndicators();
-            renderQuestion();
-            setupGlobalEvents();
-            startTimer(); 
-        };
+        window.onload = () => { initIndicators(); renderQuestion(); setupGlobalEvents(); startTimer(); };
 
         function initIndicators() {
             const container = document.getElementById('status-indicators');
-            container.innerHTML = quizData.map((_, i) => `<div class="progress-circle" data-idx="${i}">${i+1}</div>`).join('');
+            container.innerHTML = quizData.map((_, i) => `<div class="progress-circle" data-idx="${i}" onclick="jumpToQuestion(${i})">${i+1}</div>`).join('');
+        }
+
+        function jumpToQuestion(idx) {
+            saveCurrentQuestionState();
+            currentIdx = idx;
+            renderQuestion();
         }
 
         function setupGlobalEvents() {
@@ -296,14 +346,18 @@
             }, 1000);
         }
 
-        function showCustomModal(title, message, confirmText, onConfirm) {
+        function showCustomModal(title, message, confirmText, onConfirm, showCheck = true) {
             const overlay = document.getElementById('modal-overlay');
             const content = document.getElementById('modal-content');
+            const checkContainer = document.getElementById('check-remind-container');
+            const checkbox = document.getElementById('dont-ask-again');
             document.getElementById('modal-title').innerText = title;
             document.getElementById('modal-message').innerText = message;
+            checkContainer.style.display = showCheck ? 'flex' : 'none';
+            checkbox.checked = false;
             const btn = document.getElementById('modal-confirm-btn');
             btn.innerText = confirmText;
-            btn.onclick = () => { closeModal(); if (onConfirm) onConfirm(); };
+            btn.onclick = () => { if (showCheck && checkbox.checked) skipAlertPermanently = true; closeModal(); if (onConfirm) onConfirm(); };
             overlay.classList.remove('hidden');
             setTimeout(() => { overlay.classList.remove('opacity-0'); content.classList.remove('scale-90'); }, 10);
         }
@@ -319,20 +373,16 @@
             const container = document.getElementById('question-container');
             const q = quizData[currentIdx];
             const progressEl = document.getElementById('progress-text');
-            
-            if (progressEl) progressEl.innerText = `${currentIdx + 1} / ${quizData.length}`;
+            progressEl.innerText = `${currentIdx + 1} / ${quizData.length}`;
             document.getElementById('prev-btn').disabled = (currentIdx === 0);
             document.getElementById('next-btn').innerText = (currentIdx === quizData.length - 1) ? "查看結果" : "下一題";
-
             container.innerHTML = '';
             const wrapper = document.createElement('div');
             wrapper.className = 'fade-in flex flex-col items-start w-full';
-
             if (q.type === 'drag_and_drop') renderDragAndDrop(q, wrapper);
             else if (q.type === 'matching_list') renderMatchingList(q, wrapper);
             else if (q.type === 'grid_selection') renderGridSelection(q, wrapper);
             else if (q.type === 'multi_select') renderMultiSelect(q, wrapper);
-
             container.appendChild(wrapper);
             restoreCurrentQuestionState();
             updateProgressIndicators();
@@ -340,352 +390,213 @@
 
         function renderDragAndDrop(q, wrapper) {
             const title = document.createElement('h3');
-            title.className = "text-xl md:text-2xl text-gray-700 font-bold mb-10 leading-[3.2rem] text-left w-full";
-            
-            const parts = q.question.split('[__]');
-            parts.forEach((part, i) => {
-                const textSpan = document.createElement('span'); 
-                textSpan.innerText = part; 
-                title.appendChild(textSpan);
-                if (i < parts.length - 1) {
-                    const slot = createSlot(i, q.blanks[i]);
-                    slot.style.minWidth = "140px";
-                    title.appendChild(slot);
-                }
+            title.className = "text-xl md:text-2xl text-gray-700 font-bold mb-10 leading-[5.5rem] text-left w-full";
+            q.question.split('[__]').forEach((part, i, arr) => {
+                const textSpan = document.createElement('span'); textSpan.innerText = part; title.appendChild(textSpan);
+                if (i < arr.length - 1) { const slot = createSlot(i, q.blanks[i]); slot.style.minWidth = "140px"; title.appendChild(slot); }
             });
             wrapper.appendChild(title);
             renderSourceArea(q.options, wrapper);
         }
 
         function renderMatchingList(q, wrapper) {
-            const title = document.createElement('h3'); 
-            title.className = "text-xl md:text-2xl text-gray-700 font-bold mb-10 text-left w-full";
-            title.innerText = q.question; 
-            wrapper.appendChild(title);
-            
-            const list = document.createElement('div'); 
-            list.className = "grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-5xl mx-auto";
-            
-            q.items.forEach((item, idx) => {
+            const title = document.createElement('h3'); title.className = "text-xl md:text-2xl text-gray-700 font-bold mb-10 text-left w-full";
+            title.innerText = q.question; wrapper.appendChild(title);
+            const listGrid = document.createElement('div');
+            const gridClass = q.isParallel ? "grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-5xl mx-auto" : "grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-5xl mx-auto";
+            listGrid.className = gridClass;
+            const displayItems = [...q.items].map((item, originalIdx) => ({ ...item, originalIdx })).sort(() => Math.random() - 0.5);
+            const usedColors = [];
+            displayItems.forEach((item) => {
+                const colorIdx = (item.originalIdx + currentIdx) % 7; usedColors.push(colorIdx); 
                 const itemBox = document.createElement('div');
-                const colorIdx = (idx + currentIdx) % 7;
                 itemBox.className = `color-${colorIdx} p-6 pt-4 pb-6 rounded-3xl border-2 border-white shadow-sm flex flex-col gap-4 transition-all hover:scale-[1.01]`;
-
                 const label = document.createElement('div'); 
-                label.className = "text-lg font-black text-gray-700 leading-snug";
-                label.innerText = item.label; 
-                itemBox.appendChild(label);
-
-                const slot = createSlot(idx, item.answer); 
-                slot.className += ` w-full rounded-2xl py-6 border-2 dashed bg-white/80`;
-                itemBox.appendChild(slot); 
-                list.appendChild(itemBox);
+                label.className = q.isParallel ? "text-lg font-black text-gray-700 leading-snug text-center h-12 flex items-center justify-center" : "text-lg font-black text-gray-700 leading-snug text-center"; 
+                label.innerText = item.label; itemBox.appendChild(label);
+                const slot = createSlot(item.originalIdx, item.answer); 
+                slot.className += ` w-full rounded-2xl border-2 dashed bg-white/80`;
+                itemBox.appendChild(slot); listGrid.appendChild(itemBox);
             });
-
-            wrapper.appendChild(list);
-            renderSourceArea(q.options, wrapper);
+            wrapper.appendChild(listGrid);
+            renderSourceArea(q.options, wrapper, usedColors);
         }
 
         function renderGridSelection(q, wrapper) {
-            const title = document.createElement('h3');
-            title.className = "text-xl md:text-2xl text-gray-700 font-bold mb-8 text-left w-full";
-            title.innerText = q.question;
-            wrapper.appendChild(title);
-
-            const tableWrapper = document.createElement('div');
-            tableWrapper.className = "w-full max-w-4xl mx-auto bg-white/50 p-6 rounded-[30px] border-2 border-rose-50";
-            
-            const headerGrid = document.createElement('div');
-            headerGrid.className = "grid grid-cols-3 gap-4 mb-4 text-center";
-            q.headers.forEach(h => {
-                const hDiv = document.createElement('div');
-                hDiv.className = "font-black text-rose-300 uppercase tracking-widest text-sm";
-                hDiv.innerText = h;
-                headerGrid.appendChild(hDiv);
-            });
-            tableWrapper.appendChild(headerGrid);
-
-            q.rows.forEach((row, rowIdx) => {
-                const rowGrid = document.createElement('div');
-                rowGrid.className = "grid grid-cols-3 gap-4 mb-4 items-center";
-
-                const labelDiv = document.createElement('div');
-                labelDiv.className = "bg-white p-4 rounded-2xl shadow-sm font-bold text-gray-500 border border-slate-100 text-center";
-                labelDiv.innerText = row.label;
-                rowGrid.appendChild(labelDiv);
-
-                const displayOptions = row.options.map((text, originalOptIdx) => ({ text, originalOptIdx }))
-                    .sort(() => Math.random() - 0.5);
-
-                displayOptions.forEach((optObj) => {
-                    const optDiv = document.createElement('div');
-                    optDiv.className = "grid-option bg-white p-4 rounded-2xl text-center shadow-sm font-medium text-gray-400 h-full flex items-center justify-center";
-                    optDiv.innerText = optObj.text;
-                    optDiv.dataset.row = rowIdx;
-                    optDiv.dataset.originalOptIdx = optObj.originalOptIdx;
-                    
-                    optDiv.onclick = () => {
-                        rowGrid.querySelectorAll('.grid-option').forEach(el => el.classList.remove('selected'));
-                        optDiv.classList.add('selected');
-                        saveCurrentQuestionState();
-                    };
-                    rowGrid.appendChild(optDiv);
+            const title = document.createElement('h3'); title.className = "text-xl md:text-2xl text-gray-700 font-bold mb-8 text-left w-full";
+            title.innerText = q.question; wrapper.appendChild(title);
+            const tableWrapper = document.createElement('div'); 
+            tableWrapper.className = "grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-5xl mx-auto bg-white/50 p-8 rounded-[40px] border-2 border-rose-50 shadow-inner";
+            const displayRows = q.rows.map((row, originalRowIdx) => ({ ...row, originalRowIdx })).sort(() => Math.random() - 0.5);
+            displayRows.forEach((rowObj) => {
+                const rowIdx = rowObj.originalRowIdx;
+                const columnBox = document.createElement('div'); columnBox.className = "flex flex-col gap-4";
+                const labelDiv = document.createElement('div'); labelDiv.className = "bg-rose-100/50 p-4 rounded-2xl shadow-sm font-black text-rose-500 border border-white text-center text-lg min-h-[5rem] flex items-center justify-center";
+                labelDiv.innerText = rowObj.label; columnBox.appendChild(labelDiv);
+                const optionsContainer = document.createElement('div'); optionsContainer.className = "flex flex-col gap-3";
+                rowObj.options.map((text, originalOptIdx) => ({ text, originalOptIdx })).sort(() => Math.random() - 0.5).forEach((optObj) => {
+                    const optDiv = document.createElement('div'); optDiv.className = "grid-option bg-white py-4 px-4 rounded-2xl text-center shadow-sm font-bold text-gray-500 border-2 border-transparent transition-all hover:bg-rose-50 text-lg flex items-center justify-center";
+                    optDiv.innerText = optObj.text; optDiv.dataset.row = rowIdx; optDiv.dataset.originalOptIdx = optObj.originalOptIdx;
+                    optDiv.onclick = () => { columnBox.querySelectorAll('.grid-option').forEach(el => el.classList.remove('selected')); optDiv.classList.add('selected'); saveCurrentQuestionState(); };
+                    optionsContainer.appendChild(optDiv);
                 });
-                tableWrapper.appendChild(rowGrid);
+                columnBox.appendChild(optionsContainer); tableWrapper.appendChild(columnBox);
             });
-
             wrapper.appendChild(tableWrapper);
         }
 
         function renderMultiSelect(q, wrapper) {
-            const title = document.createElement('h3');
-            title.className = "text-xl md:text-2xl text-gray-700 font-bold mb-10 text-left w-full";
-            title.innerText = q.question;
-            wrapper.appendChild(title);
-
-            const grid = document.createElement('div');
-            grid.className = "grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl mx-auto";
-
+            const title = document.createElement('h3'); title.className = "text-xl md:text-2xl text-gray-700 font-bold mb-10 text-left w-full";
+            title.innerText = q.question; wrapper.appendChild(title);
+            const grid = document.createElement('div'); grid.className = "grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl mx-auto";
             const shuffled = [...q.options].sort(() => Math.random() - 0.5);
-            const colorIndexes = Array.from({length: 7}, (_, i) => i).sort(() => Math.random() - 0.5);
-
-            shuffled.forEach((opt, idx) => {
+            shuffled.forEach((opt) => {
                 const btn = document.createElement('div');
-                const colorIdx = colorIndexes[idx % 7];
-                btn.className = `select-option color-${colorIdx} p-8 rounded-3xl shadow-sm text-center text-xl font-bold text-gray-700`;
-                btn.innerText = opt.text;
-                btn.dataset.text = opt.text;
-                
-                btn.onclick = () => {
-                    btn.classList.toggle('selected');
-                    saveCurrentQuestionState();
-                };
+                btn.className = `select-option color-${opt.colorIdx} p-5 rounded-3xl shadow-sm text-center text-xl font-bold text-gray-700`;
+                btn.innerText = opt.text; btn.dataset.text = opt.text;
+                btn.onclick = () => { btn.classList.toggle('selected'); saveCurrentQuestionState(); };
                 grid.appendChild(btn);
             });
-
             wrapper.appendChild(grid);
         }
 
         function createSlot(index, answer) {
-            const slot = document.createElement('div');
-            slot.className = `slot`;
-            slot.dataset.type = "slot"; 
-            slot.dataset.index = index; 
-            slot.dataset.answer = answer;
+            const slot = document.createElement('div'); slot.className = `slot`; slot.dataset.type = "slot"; slot.dataset.index = index; slot.dataset.answer = answer;
             slot.ondragover = (e) => { e.preventDefault(); slot.classList.add('drag-over'); };
             slot.ondragleave = () => slot.classList.remove('drag-over');
             slot.ondrop = (e) => handleDrop(e, slot);
             return slot;
         }
 
-        function renderSourceArea(options, wrapper) {
+        function renderSourceArea(options, wrapper, excludeColors = []) {
             const sourceArea = document.createElement('div');
             sourceArea.className = "mt-12 p-8 bg-rose-50/20 rounded-[40px] border-2 border-dashed border-rose-100 flex flex-wrap justify-center gap-5 min-h-[140px] w-full";
             sourceArea.id = "source-area"; sourceArea.dataset.type = "source";
             sourceArea.ondragover = (e) => e.preventDefault();
             sourceArea.ondrop = (e) => handleDrop(e, sourceArea);
-            
             const shuffled = [...options].sort(() => Math.random() - 0.5);
-            shuffled.forEach((opt, idx) => {
-                sourceArea.appendChild(createDragElement(opt, idx, idx % 7));
-            });
+            const availableColors = [0, 1, 2, 3, 4, 5, 6].filter(c => !excludeColors.includes(c));
+            const finalColors = availableColors.length > 0 ? availableColors : [0, 1, 2, 3, 4, 5, 6];
+            shuffled.forEach((opt, idx) => { sourceArea.appendChild(createDragElement(opt, idx, finalColors[idx % finalColors.length])); });
             wrapper.appendChild(sourceArea);
         }
 
         function createDragElement(text, idSuffix, colorIdx) {
-            const el = document.createElement('div');
-            el.className = `macaron-btn color-${colorIdx} px-8 py-3 rounded-2xl shadow-sm font-bold text-gray-700 text-lg whitespace-nowrap`;
-            el.innerText = text; 
-            el.id = `opt-${currentIdx}-${idSuffix}-${Math.random().toString(36).substr(2, 5)}`;
-            el.draggable = true; 
-            el.dataset.value = text;
+            const el = document.createElement('div'); el.className = `macaron-btn color-${colorIdx} px-8 py-3 rounded-2xl shadow-sm font-bold text-gray-700 text-lg whitespace-nowrap`;
+            el.innerText = text; el.id = `opt-${currentIdx}-${idSuffix}-${Math.random().toString(36).substr(2, 5)}`;
+            el.draggable = true; el.dataset.value = text;
             el.ondragstart = (e) => { e.dataTransfer.setData("text/plain", el.id); e.target.style.opacity = "0.4"; };
             el.ondragend = (e) => { e.target.style.opacity = "1"; };
             return el;
         }
 
         function handleDrop(e, target) {
-            e.preventDefault();
-            const elId = e.dataTransfer.getData("text/plain");
-            const el = document.getElementById(elId);
+            e.preventDefault(); const elId = e.dataTransfer.getData("text/plain"); const el = document.getElementById(elId);
             if (!el) return;
-            
-            if (target.dataset.type === "slot") {
-                const existing = target.querySelector('.macaron-btn');
-                if (existing) document.getElementById('source-area').appendChild(existing);
-                target.appendChild(el);
-            } else if (target.dataset.type === "source") {
-                target.appendChild(el);
-            }
+            if (target.dataset.type === "slot") { const existing = target.querySelector('.macaron-btn'); if (existing) document.getElementById('source-area').appendChild(existing); target.appendChild(el); }
+            else if (target.dataset.type === "source") { target.appendChild(el); }
             saveCurrentQuestionState();
         }
 
         function saveCurrentQuestionState() {
-            const q = quizData[currentIdx];
-            const state = { values: {} };
-            
-            if (q.type === 'grid_selection') {
-                document.querySelectorAll('.grid-option.selected').forEach(el => {
-                    state.values[el.dataset.row] = parseInt(el.dataset.originalOptIdx);
-                });
-            } else if (q.type === 'multi_select') {
-                const selected = [];
-                document.querySelectorAll('.select-option.selected').forEach(el => selected.push(el.dataset.text));
-                state.values = selected;
-            } else {
-                document.querySelectorAll('.slot').forEach(slot => {
-                    const item = slot.querySelector('.macaron-btn');
-                    if (item) state.values[slot.dataset.index] = { elId: item.id, val: item.dataset.value };
-                });
-            }
+            const q = quizData[currentIdx]; const state = { values: {} };
+            if (q.type === 'grid_selection') document.querySelectorAll('.grid-option.selected').forEach(el => { state.values[el.dataset.row] = parseInt(el.dataset.originalOptIdx); });
+            else if (q.type === 'multi_select') { const selected = []; document.querySelectorAll('.select-option.selected').forEach(el => selected.push(el.dataset.text)); state.values = selected; }
+            else document.querySelectorAll('.slot').forEach(slot => { const item = slot.querySelector('.macaron-btn'); if (item) state.values[slot.dataset.index] = { elId: item.id, val: item.dataset.value }; });
             userStates[currentIdx] = state;
         }
 
         function restoreCurrentQuestionState() {
-            const state = userStates[currentIdx];
-            if (!state) return;
+            const state = userStates[currentIdx]; if (!state) return;
             const q = quizData[currentIdx];
-
-            if (q.type === 'grid_selection') {
-                Object.keys(state.values).forEach(rowIdx => {
-                    const origIdx = state.values[rowIdx];
-                    const el = document.querySelector(`.grid-option[data-row="${rowIdx}"][data-original-opt-idx="${origIdx}"]`);
-                    if (el) el.classList.add('selected');
-                });
-            } else if (q.type === 'multi_select') {
-                state.values.forEach(val => {
-                    const el = document.querySelector(`.select-option[data-text="${val}"]`);
-                    if (el) el.classList.add('selected');
-                });
-            } else {
-                Object.keys(state.values).forEach(slotIdx => {
-                    const elId = state.values[slotIdx].elId;
-                    const el = document.getElementById(elId);
-                    const slot = document.querySelector(`.slot[data-index="${slotIdx}"]`);
-                    if (el && slot) slot.appendChild(el);
-                });
-            }
+            if (q.type === 'grid_selection') Object.keys(state.values).forEach(rowIdx => { const origIdx = state.values[rowIdx]; const el = document.querySelector(`.grid-option[data-row="${rowIdx}"][data-original-opt-idx="${origIdx}"]`); if (el) el.classList.add('selected'); });
+            else if (q.type === 'multi_select') state.values.forEach(val => { const el = document.querySelector(`.select-option[data-text="${val}"]`); if (el) el.classList.add('selected'); });
+            else Object.keys(state.values).forEach(slotIdx => { const elId = state.values[slotIdx].elId; const el = document.getElementById(elId); const slot = document.querySelector(`.slot[data-index="${slotIdx}"]`); if (el && slot) slot.appendChild(el); });
         }
 
         function navigate(dir) {
             saveCurrentQuestionState();
-            if (dir > 0) {
-                if (!quizCheckedStatus[currentIdx]) {
-                    showCustomModal("提醒", "您尚未檢查答案，確定要直接進入下一題嗎？", "好的", () => {
-                        performNavigation(dir);
-                    });
+            if (dir > 0 && !quizCheckedStatus[currentIdx]) {
+                if (currentIdx === quizData.length - 1) {
+                    const unchecked = quizData.map((_, i) => quizCheckedStatus[i] ? null : i + 1).filter(v => v !== null);
+                    if (unchecked.length > 0) {
+                        showCustomModal("提醒", `第 ${unchecked.join(', ')} 題尚未檢查答案喔！趕緊按下返回。`, "查看結果", () => performNavigation(dir), false);
+                        return;
+                    }
+                } else if (!skipAlertPermanently) {
+                    showCustomModal("提醒", "請記得回來檢查答案喔", "好的", () => performNavigation(dir));
                     return;
                 }
             }
             performNavigation(dir);
         }
 
-        function performNavigation(dir) {
-            if (currentIdx + dir >= quizData.length) { showFinalSummary(); return; }
-            currentIdx += dir; renderQuestion();
-        }
+        function performNavigation(dir) { if (currentIdx + dir >= quizData.length) { showFinalSummary(); return; } currentIdx += dir; renderQuestion(); }
 
         function checkAnswer() {
-            quizCheckedStatus[currentIdx] = true;
-            totalAttempts++;
-            const q = quizData[currentIdx];
-            let errors = 0; let incomplete = false;
-            
-            if (q.type === 'grid_selection') {
-                q.rows.forEach((row, rowIdx) => {
-                    const selected = document.querySelector(`.grid-option.selected[data-row="${rowIdx}"]`);
-                    if (!selected) incomplete = true;
-                    else if (parseInt(selected.dataset.originalOptIdx) !== row.answer) errors++;
-                });
-            } else if (q.type === 'multi_select') {
-                const selected = Array.from(document.querySelectorAll('.select-option.selected')).map(el => el.dataset.text);
-                if (selected.length === 0) incomplete = true;
-                
-                q.options.forEach(opt => {
-                    const isSelected = selected.includes(opt.text);
-                    if (opt.correct && !isSelected) errors++;
-                    if (!opt.correct && isSelected) errors++;
-                });
-            } else {
-                document.querySelectorAll('.slot').forEach(slot => {
-                    const item = slot.querySelector('.macaron-btn');
-                    if (!item) incomplete = true;
-                    if (item && item.dataset.value !== slot.dataset.answer) {
-                        errors++;
-                        slot.classList.add('border-red-400');
-                        slot.classList.remove('border-emerald-400');
-                    } else if (item) {
-                        slot.classList.add('border-emerald-400');
-                        slot.classList.remove('border-red-400');
-                    }
-                });
-            }
-
+            quizCheckedStatus[currentIdx] = true; totalAttempts++; const q = quizData[currentIdx]; let errors = 0; let incomplete = false;
+            if (q.type === 'grid_selection') q.rows.forEach((row, rowIdx) => { const selected = document.querySelector(`.grid-option.selected[data-row="${rowIdx}"]`); if (!selected) incomplete = true; else if (parseInt(selected.dataset.originalOptIdx) !== row.answer) errors++; });
+            else if (q.type === 'multi_select') { const selected = Array.from(document.querySelectorAll('.select-option.selected')).map(el => el.dataset.text); if (selected.length === 0) incomplete = true; q.options.forEach(opt => { const isSelected = selected.includes(opt.text); if (opt.correct && !isSelected) errors++; if (!opt.correct && isSelected) errors++; }); }
+            else document.querySelectorAll('.slot').forEach(slot => { const item = slot.querySelector('.macaron-btn'); if (!item) incomplete = true; if (item && item.dataset.value !== slot.dataset.answer) { errors++; slot.classList.add('border-red-400'); } else if (item) { slot.classList.add('border-emerald-400'); } });
             if (incomplete) { showToast("請完成所有選項喔！", "error"); return; }
-            if (errors === 0) {
-                showToast("✨ 太強了！全部正確！", "success");
-                quizPassedStatus[currentIdx] = true;
-                updateProgressIndicators();
-            } else {
-                showToast(`有 ${errors} 個錯誤，再細心檢查看看！`, "error");
-            }
+            if (errors === 0) { showToast("✨ 太強了！全部正確！", "success"); quizPassedStatus[currentIdx] = true; updateProgressIndicators(); }
+            else showToast(`有 ${errors} 個錯誤，再細心檢查看看！`, "error");
         }
 
         function updateProgressIndicators() {
-            document.querySelectorAll('.progress-circle').forEach(circle => {
-                if (quizPassedStatus[parseInt(circle.dataset.idx)]) circle.classList.add('passed');
-            });
+            document.querySelectorAll('.progress-circle').forEach(circle => { if (quizPassedStatus[parseInt(circle.dataset.idx)]) circle.classList.add('passed'); });
         }
 
-        function showToast(msg, type) {
-            const toast = document.getElementById('toast');
-            if (toast) {
-                toast.innerText = msg;
-                toast.style.backgroundColor = type === 'success' ? '#10b981' : '#334155';
-                toast.style.opacity = "1";
-                setTimeout(() => toast.style.opacity = "0", 2500);
-            }
-        }
+        function showToast(msg, type) { const toast = document.getElementById('toast'); toast.innerText = msg; toast.style.backgroundColor = type === 'success' ? '#10b981' : '#334155'; toast.style.opacity = "1"; setTimeout(() => toast.style.opacity = "0", 2500); }
 
+        /**
+         * 改動重點：
+         * 1. 挑戰紀錄區塊縮為一行。
+         * 2. 高度與答對題數一致。
+         * 3. 採用並列佈局節省空間。
+         */
         function showFinalSummary() {
             if (timerInterval) clearInterval(timerInterval);
             const timerText = document.getElementById('timer').innerText;
-            let correctCount = 0; 
-            quizData.forEach((_, idx) => { if (quizPassedStatus[idx]) correctCount++; });
-            
+            let correctCount = 0; quizData.forEach((_, idx) => { if (quizPassedStatus[idx]) correctCount++; });
+            document.getElementById('final-comment').innerText = scoreComments[correctCount];
             const randomQuote = inspirationalQuotes[Math.floor(Math.random() * inspirationalQuotes.length)];
-            document.getElementById('quote-zh').innerText = randomQuote.zh;
-            document.getElementById('quote-en').innerText = randomQuote.en;
-            
+            document.getElementById('quote-zh').innerText = randomQuote.zh; document.getElementById('quote-en').innerText = randomQuote.en;
             const stats = document.getElementById('final-stats');
+            
             stats.innerHTML = `
-                <div class="grid grid-cols-2 gap-6">
-                    <div class="bg-rose-50 p-8 rounded-[30px] text-center border border-rose-100 shadow-sm flex flex-col justify-center">
-                        <p class="text-gray-400 font-bold mb-2 uppercase text-xs tracking-widest">測驗結果</p>
-                        <p class="text-3xl font-black text-rose-400">答對題數：${correctCount} / 總題數：${quizData.length}</p>
+                <div class="flex flex-col items-center gap-4">
+                    <!-- 第一層：答對題數與計時並列 -->
+                    <div class="flex flex-wrap justify-center gap-4 w-full max-w-2xl">
+                        <div class="flex-grow bg-rose-50 py-4 px-6 rounded-[30px] border border-rose-100 shadow-sm min-w-[180px]">
+                            <p class="text-2xl font-black text-rose-400">
+                                答對題數：${correctCount} / ${quizData.length}
+                            </p>
+                        </div>
+                        <div class="flex-grow bg-emerald-50 py-4 px-6 rounded-[30px] border border-emerald-100 shadow-sm min-w-[180px]">
+                            <p class="text-2xl font-black text-emerald-500">
+                                ⏱️ 總用時：${timerText}
+                            </p>
+                        </div>
                     </div>
-                    <div class="bg-emerald-50 p-8 rounded-[30px] text-center border border-emerald-100 shadow-sm">
-                        <p class="text-gray-400 font-bold mb-2 uppercase text-xs tracking-widest">總用時</p>
-                        <p class="text-5xl font-black text-emerald-400">${timerText}</p>
+                    
+                    <!-- 第二層：挑戰紀錄區塊 (縮為一行，高度與上方一致) -->
+                    <div class="w-full max-w-2xl bg-indigo-50 py-4 px-8 rounded-[30px] border-2 border-indigo-100 shadow-md flex justify-around items-center">
+                        <div class="flex items-center gap-2">
+                            <span class="text-indigo-400 font-bold text-lg">📊 挑戰次數：</span>
+                            <span class="text-2xl font-black text-indigo-600">${quizAttemptCount} 次</span>
+                        </div>
+                        <div class="h-6 w-[2px] bg-indigo-200"></div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-indigo-400 font-bold text-lg">🔍 檢查次數：</span>
+                            <span class="text-2xl font-black text-indigo-600">${totalAttempts} 次</span>
+                        </div>
                     </div>
-                </div>
-                <div class="text-center p-6 bg-slate-50 rounded-2xl">
-                    <p class="text-lg text-slate-500 font-medium">
-                        挑戰序號：<span class="text-rose-400 font-bold">#${quizAttemptCount}</span> | 
-                        檢查次數：<span class="text-rose-400 font-bold">${totalAttempts}</span>
-                    </p>
                 </div>`;
             document.getElementById('result-overlay').classList.remove('hidden');
         }
 
-        function restartQuiz() {
-            document.getElementById('result-overlay').classList.add('hidden');
-            userStates = {}; quizCheckedStatus = {}; quizPassedStatus = {};
-            quizAttemptCount++; totalAttempts = 0; isTimerStarted = false;
-            currentIdx = 0;
-            renderQuestion();
-            startTimer();
-        }
+        function restartQuiz() { document.getElementById('result-overlay').classList.add('hidden'); userStates = {}; quizCheckedStatus = {}; quizPassedStatus = {}; quizAttemptCount++; totalAttempts = 0; isTimerStarted = false; currentIdx = 0; renderQuestion(); startTimer(); }
     </script>
 </body>
 </html>
